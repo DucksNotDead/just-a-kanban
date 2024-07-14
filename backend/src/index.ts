@@ -1,7 +1,7 @@
 import express from 'express'
 
 const app = express()
-const port = 8080
+const port = '0.0.0.0'
 
 app.use(express.json())
 
