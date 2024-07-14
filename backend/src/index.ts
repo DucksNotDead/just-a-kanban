@@ -1,11 +1,9 @@
-import express from 'express'
+import * as http from "node:http";
 
-const app = express()
+const server = http.createServer()
 
-const port = Number(process.env.PORT) || 10000
+const port = process.env.PORT || 4000
 
-app.use(express.json())
-
-app.get('/', () => 'Hello World!')
-
-app.listen(port, '0.0.0.0', () => console.log("API STARTS ON " + port))
+server.listen(port, () => {
+  console.log('working on ' + port);
+})
