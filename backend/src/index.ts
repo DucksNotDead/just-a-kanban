@@ -8,4 +8,4 @@ app.use(express.json())
 
 app.get('/', () => 'Hello World!')
 
-app.listen(port, () => console.log("API STARTS ON " + port))
+app.listen(port, '0.0.0.0', () => console.log("API STARTS ON " + port))
