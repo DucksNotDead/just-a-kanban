@@ -5,9 +5,9 @@ import { Task } from "../entity/Task";
 import { Step } from "../entity/Step";
 
 export const db = {
-  init: async () => AppDataSource.initialize(),
-  users: () => AppDataSource.getRepository(User),
-  categories: () => AppDataSource.getRepository(Category),
-  tasks: () => AppDataSource.getRepository(Task),
-  steps: () => AppDataSource.getRepository(Step),
-} as const
+	init: async () => AppDataSource.initialize(),
+	users: () => AppDataSource.getRepository(User),
+	categories: () => AppDataSource.getRepository(Category),
+	tasks: () => AppDataSource.getRepository(Task),
+	steps: () => AppDataSource.getRepository(Step),
+} as const;

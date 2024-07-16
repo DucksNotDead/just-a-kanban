@@ -3,17 +3,15 @@ import { Task } from "./Task";
 
 @Entity()
 export class Step {
+	@PrimaryGeneratedColumn()
+	id: number;
 
-  @PrimaryGeneratedColumn()
-  id: number
+	@Column()
+	name: string;
 
-  @Column()
-  name: string
+	@Column()
+	icon: string;
 
-  @Column()
-  icon: string
-
-  @OneToMany(() => Task, task => task.step, {})
-  tasks: Task[]
-
+	@OneToMany(() => Task, (task) => task.step, {})
+	tasks: Task[];
 }

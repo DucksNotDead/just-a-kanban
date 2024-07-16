@@ -11,10 +11,10 @@ import { IdValidator } from "../../common/IdValidator";
 import { TaskMoveValidator } from "./validators/TaskMoveValidator";
 
 export const TaskController: IAppController = {
-  "get|/tasks": { action: getUserTasks },
-  "get|/task": { action: getFullTask, validator: IdValidator },
-  "post|/tasks": { action: createTask, validator: TaskValidator },
-  "put|/tasks": { action: updateTask, validator: FullTaskValidator },
-  "put|/task-move": { action: moveTask, validator: TaskMoveValidator },
-  "delete|/tasks": { action: deleteTask, validator: IdValidator }
-}
+	"get|/tasks": { action: getUserTasks },
+	"get|/task": { action: getFullTask, validator: IdValidator },
+	"post|/tasks": { action: createTask, validator: TaskValidator },
+	"put|/tasks": { action: updateTask, validator: FullTaskValidator },
+	"put|/task-move": { action: moveTask, validator: TaskMoveValidator },
+	"delete|/tasks": { action: deleteTask, validator: IdValidator },
+};

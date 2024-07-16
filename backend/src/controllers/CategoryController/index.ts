@@ -8,8 +8,11 @@ import { IdValidator } from "../../common/IdValidator";
 import { FullCategoryValidator } from "./validators/FullCategoryValidator";
 
 export const CategoryController: IAppController = {
-  "get|/categories": { action: getUserCategories },
-  "post|/categories": { action: createCategory, validator: CategoryValidator },
-  "delete|/categories": { action: deleteCategory, validator: IdValidator },
-  "put|/categories": { action: updateCategory, validator: FullCategoryValidator }
-}
+	"get|/categories": { action: getUserCategories },
+	"post|/categories": { action: createCategory, validator: CategoryValidator },
+	"delete|/categories": { action: deleteCategory, validator: IdValidator },
+	"put|/categories": {
+		action: updateCategory,
+		validator: FullCategoryValidator,
+	},
+};

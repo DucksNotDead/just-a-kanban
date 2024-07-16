@@ -6,11 +6,11 @@ import { signUp } from "./operations/signUp";
 import { auth } from "./operations/auth";
 import { bye } from "./operations/bye";
 
-const [registrationRoute, loginRoute, authRoute] = AuthRoutes
+const [registrationRoute, loginRoute, authRoute] = AuthRoutes;
 
 export const AuthController: IAppController = {
-  ["post|/" + registrationRoute]: { action: signIn, validator: UserValidator },
-  ["post|/" + loginRoute]: { action: signUp, validator: UserValidator },
-  ["post|/" + authRoute]: { action: auth },
-  "delete|/user": { action: bye }
-}
+	["post|/" + registrationRoute]: { action: signIn, validator: UserValidator },
+	["post|/" + loginRoute]: { action: signUp, validator: UserValidator },
+	["post|/" + authRoute]: { action: auth },
+	"delete|/user": { action: bye },
+};

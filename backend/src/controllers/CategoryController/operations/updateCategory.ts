@@ -3,25 +3,26 @@ import { db } from "../../../db";
 import { sendError, sendSuccess } from "../../../response/senders";
 
 export async function updateCategory(request: Request, response: Response) {
-  try {
-    const {user, ...category} = request.body
+	try {
+		const { user, ...category } = request.body;
 
-    const candidate = await db.categories().findOneBy({ id: category.id, user })
-    if (!candidate) {
-      return sendError(response, 405)
-    }
+		const candidate = await db
+			.categories()
+			.findOneBy({ id: category.id, user });
+		if (!candidate) {
+			return sendError(response, 405);
+		}
 
-    for (const newField in category) {
-      candidate[newField] = category[newField]
-    }
+		for (const newField in category) {
+			candidate[newField] = category[newField];
+		}
 
-    const updated = await db.categories().save(candidate)
+		const updated = await db.categories().save(candidate);
 
-    return sendSuccess(response, {
-      category: updated
-    })
-  }
-  catch {
-    return sendError(response, 500)
-  }
+		return sendSuccess(response, {
+			category: updated,
+		});
+	} catch {
+		return sendError(response, 500);
+	}
 }

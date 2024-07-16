@@ -5,37 +5,35 @@ import { User } from "./User";
 
 @Entity()
 export class Task {
+	@PrimaryGeneratedColumn()
+	id: number;
 
-  @PrimaryGeneratedColumn()
-  id: number
+	@Column()
+	title: string;
 
-  @Column()
-  title: string
+	@Column("json")
+	body: object;
 
-  @Column("json")
-  body: object
+	@Column({ length: 20, nullable: true })
+	starts: string;
 
-  @Column({ length: 20, nullable: true })
-  starts: string
+	@Column({ length: 20, nullable: true })
+	deadline: string;
 
-  @Column({ length: 20, nullable: true })
-  deadline: string
+	@ManyToOne(() => User, (user) => user.tasks, {
+		cascade: true,
+		onDelete: "CASCADE",
+	})
+	user: User;
 
-  @ManyToOne(() => User, user => user.tasks, {
-    cascade: true,
-    onDelete: "CASCADE"
-  })
-  user: User
+	@ManyToOne(() => Category, (category) => category.tasks, {
+		onDelete: "SET NULL",
+	})
+	category: Category;
 
-  @ManyToOne(() => Category, category => category.tasks, {
-    onDelete: "SET NULL"
-  })
-  category: Category
+	@ManyToOne(() => Step, (step) => step.tasks)
+	step: Step;
 
-  @ManyToOne(() => Step, step => step.tasks)
-  step: Step
-
-  @Column({ nullable: true })
-  stepReason: string
-
+	@Column({ nullable: true })
+	stepReason: string;
 }

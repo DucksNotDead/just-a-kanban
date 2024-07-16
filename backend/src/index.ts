@@ -9,21 +9,18 @@ import { AuthMiddleware } from "./middleware/AuthMiddleware";
 import { StepController } from "./controllers/StepController";
 
 db.init().then(() => {
+	const app = express();
 
-  const app = express()
+	app.use(express.json());
 
-  app.use(express.json())
+	new AppRouter(
+		AuthController,
+		TaskController,
+		CategoryController,
+		StepController,
+	)
+		.protect(AuthMiddleware)
+		.init(app);
 
-  new AppRouter(
-    AuthController,
-    TaskController,
-    CategoryController,
-    StepController
-  ).protect(
-    AuthMiddleware
-  )
-    .init(app)
-
-  app.listen(PORT, () => console.log("STARTS ON " + PORT))
-
-})
+	app.listen(PORT, () => console.log("STARTS ON " + PORT));
+});
