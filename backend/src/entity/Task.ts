@@ -36,4 +36,7 @@ export class Task {
 
 	@Column({ nullable: true })
 	stepReason: string;
+
+	@Column({ default: false })
+	inBasket: boolean
 }

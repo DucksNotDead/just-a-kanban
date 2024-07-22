@@ -1,28 +1,23 @@
 import { Request, Response } from "express";
-import { sendError, sendSuccess } from "../../../response/senders";
-import { comparePassword, createToken } from "../../../global/hashing";
 import { db } from "../../../db";
+import {
+	comparePassword,
+	createToken,
+	hashPassword,
+	userFromRequest,
+} from "../../../global/hashing";
+import { sendError, sendSuccess } from "../../../response/senders";
+import { login } from "./login";
 
-export async function signUp(
-	request: Request,
-	response: Response,
-	redirected?: boolean,
-) {
-	const { username, password } = request.body;
+export async function signUp(request: Request, response: Response) {
+	const { username, name, password } = request.body;
 	const candidate = await db.users().findOneBy({ username });
-	if (!candidate) {
-		return sendError(response, 402);
+	if (candidate) {
+		return await login(request, response, true);
 	}
-	const isPasswordValid = await comparePassword(password, candidate.password);
-	if (!isPasswordValid) {
-		return sendError(response, 402);
-	}
-
-	delete candidate.password;
-
-	return sendSuccess(response, {
-		token: createToken(username),
-		user: candidate,
-		redirected: redirected,
-	});
+	const newUser = db
+		.users()
+		.create({ username, name, password: await hashPassword(password) });
+	await db.users().save(newUser);
+	return await login(request, response);
 }

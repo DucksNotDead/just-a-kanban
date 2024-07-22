@@ -1,4 +1,4 @@
-export const PORT = 8080;
+export const PORT = 8000;
 
 export const SECRET_KEY = "qwertyxvz";
 

@@ -15,4 +15,7 @@ export const UserValidator = checkValid<User>({
 	password: {
 		isStrongPassword: true,
 	},
+	name: {
+		optional: true
+	}
 });

@@ -1,0 +1,33 @@
+@use "app/theme/variables" as v;
+
+.Card {
+   background-color: v.$c-white;
+  border-radius: v.$sm;
+  box-shadow: v.$bs-z4;
+  border-style: solid;
+  border-top-width: v.$base;
+  border-bottom-width: v.$base;
+  border-left-width: 0;
+  border-right-width: 0;
+  width: clamp(240px, 100%, 300px);
+  height: fit-content;
+  min-height: 80px;
+  max-height: 320px;
+
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
+  &Inner {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    width: 100%;
+    flex: 1;
+    padding: v.$sm v.$md;
+    line-clamp: 3;
+    -webkit-line-clamp: 3;
+  }
+}

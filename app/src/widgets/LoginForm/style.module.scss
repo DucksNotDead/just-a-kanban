@@ -1,0 +1,20 @@
+@use "app/theme/variables" as v;
+
+.Container {
+  padding: v.$lg;
+  gap: v.$lg;
+}
+
+.Form {
+  width: clamp(calc(#{v.$v-min} - #{v.$md} * 4), 100%, 540px);
+  :global {
+    .ant-form-item {
+      margin-bottom: v.$md;
+    }
+  }
+}
+
+.LoginSuccess {
+  transition: 500ms;
+  opacity: 0;
+}

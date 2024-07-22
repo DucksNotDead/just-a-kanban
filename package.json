@@ -11,5 +11,8 @@
       "globals": "^15.8.0",
       "prettier": "3.3.3",
       "typescript-eslint": "^7.16.1"
+   },
+   "dependencies": {
+      "eslint-plugin-css": "^0.10.0"
    }
 }
