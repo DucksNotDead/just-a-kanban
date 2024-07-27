@@ -1,6 +1,7 @@
-import { Request, Response } from "express";
-import { db } from "../../../db";
-import { sendError, sendSuccess } from "../../../response/senders";
+import { Request, Response } from 'express';
+import { db } from '../../../db';
+import { sendError, sendSuccess } from '../../../response/senders';
+import { getCurrentDate } from '../../../common/getCurrentDate';
 
 export async function updateTask(request: Request, response: Response) {
 	try {
@@ -12,10 +13,12 @@ export async function updateTask(request: Request, response: Response) {
 		}
 
 		for (const newField in task) {
-			if (!["step", "user"].includes(newField)) {
+			if (!['step', 'user'].includes(newField)) {
 				candidate[newField] = task[newField];
 			}
 		}
+
+		candidate.updated = getCurrentDate();
 
 		await db.tasks().save(candidate);
 

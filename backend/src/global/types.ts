@@ -1,7 +1,7 @@
-import { Request, Response } from "express";
-import { errorMessages } from "./errors";
-import { ValidationChain } from "express-validator";
-import { RunnableValidationChains } from "express-validator/lib/middlewares/schema";
+import { Request, Response } from 'express';
+import { errorMessages } from './errors';
+import { ValidationChain } from 'express-validator';
+import { RunnableValidationChains } from 'express-validator/lib/middlewares/schema';
 
 export type TControllerAction = (request: Request, response: Response) => any;
 

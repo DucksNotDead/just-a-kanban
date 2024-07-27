@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { db } from "../../../db";
 import { sendError, sendSuccess } from "../../../response/senders";
+import { getCurrentDate } from '../../../common/getCurrentDate';
 
 export async function moveTask(request: Request, response: Response) {
 	const { user, step, id } = request.body;
@@ -26,6 +27,7 @@ export async function moveTask(request: Request, response: Response) {
 
 	candidate.stepReason = request.body.reason ?? null;
 	candidate.step = newStep;
+	candidate.updated = getCurrentDate()
 	const updated = await db.tasks().save(candidate);
 	return sendSuccess(response, {
 		task: updated,

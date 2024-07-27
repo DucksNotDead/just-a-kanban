@@ -1,6 +1,8 @@
-import { Request, Response } from "express";
-import { db } from "../../../db";
-import { sendError, sendSuccess } from "../../../response/senders";
+import { Request, Response } from 'express';
+import { db } from '../../../db';
+import { sendError, sendSuccess } from '../../../response/senders';
+import { Task } from '../../../entity/Task';
+import { getCurrentDate } from '../../../common/getCurrentDate';
 
 export async function createTask(request: Request, response: Response) {
 	const { user, ...task } = request.body;
@@ -9,6 +11,8 @@ export async function createTask(request: Request, response: Response) {
 	if (candidate) {
 		return sendError(response, 403, { id: candidate.id });
 	}
+
+	task.user = user;
 
 	if (task.category) {
 		const category = await db
@@ -21,12 +25,14 @@ export async function createTask(request: Request, response: Response) {
 		task.category = null;
 	}
 
-	const firstStep = (await db.steps().find({ take: 1 }))[0];
-	task.user = user;
-	task.step = firstStep;
+	task.step = (await db.steps().find({ take: 1 }))[0];
 
-	const newTask = await db.tasks().save(db.tasks().create(task));
-	//@ts-ignore
+	const currentDate = getCurrentDate();
+	task.updated = currentDate;
+	task.created = currentDate;
+
+	const newTask = await db.tasks().save(db.tasks().create(task as Task));
+
 	delete newTask.user;
 
 	return sendSuccess(response, { newTask });

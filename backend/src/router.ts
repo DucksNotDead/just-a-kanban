@@ -1,6 +1,5 @@
 import { IAppRoute, IAppController } from "./global/types";
 import { Express, Request, Response } from "express";
-import { AuthMiddleware } from "./middleware/AuthMiddleware";
 import { validate } from "./global/validate";
 import { sendError } from "./response/senders";
 

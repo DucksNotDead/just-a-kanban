@@ -3,6 +3,8 @@ import { Category } from "./Category";
 import { Step } from "./Step";
 import { User } from "./User";
 
+const dateLength = { length: 20 }
+
 @Entity()
 export class Task {
 	@PrimaryGeneratedColumn()
@@ -14,10 +16,16 @@ export class Task {
 	@Column("json")
 	body: object;
 
-	@Column({ length: 20, nullable: true })
+	@Column(dateLength)
+	created: string;
+
+	@Column(dateLength)
+	updated: string
+
+	@Column({ ...dateLength, nullable: true })
 	starts: string;
 
-	@Column({ length: 20, nullable: true })
+	@Column({ ...dateLength, nullable: true })
 	deadline: string;
 
 	@ManyToOne(() => User, (user) => user.tasks, {
