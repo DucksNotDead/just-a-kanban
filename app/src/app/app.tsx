@@ -1,5 +1,5 @@
 import { AppRouter } from "../router/AppRouter";
-import { UserContextProvider } from "../context/UserContext";
+import { UserContextProvider } from './providers/UserContext';
 import { ConfigProvider } from "antd";
 import { AntConfig } from "./theme/ant-config";
 import "./theme/index.scss";

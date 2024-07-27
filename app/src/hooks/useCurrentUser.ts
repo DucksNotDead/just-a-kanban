@@ -1,6 +1,6 @@
 import { useCallback, useContext, useMemo } from 'react';
 import { TOKEN_KEY } from 'constants/Settings';
-import { UserContext } from '../context/UserContext';
+import { UserContext } from 'app/providers/UserContext';
 import { useConnect } from './useConnect';
 import { IResponseUser, IUserCredits } from 'constants/Types';
 

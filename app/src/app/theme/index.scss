@@ -61,6 +61,16 @@ h3 {
 	text-transform: uppercase;
 	font-weight: 600;
 	color: $c-dark-grey;
+	white-space: nowrap;
+}
+
+h4 {
+	font-size: .8rem;
+	letter-spacing: clamp(0.12rem, 0.1143rem + 0.0286vw, 0.16rem);
+	margin-right: calc(clamp(0.12rem, 0.1143rem + 0.0286vw, 0.16rem) * -1);
+	text-transform: capitalize;
+	font-weight: 600;
+	color: $c-black;
 }
 
 p {

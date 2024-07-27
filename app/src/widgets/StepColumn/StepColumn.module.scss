@@ -1,0 +1,75 @@
+@use 'app/theme/variables' as v;
+
+.StepColumn {
+	overflow: hidden auto;
+	position: relative;
+	background-color: v.$c-grey;
+	width: 6vw;
+	transition: v.$tr-md;
+	display: flex;
+	flex-direction: column;
+
+	opacity: 0;
+	transform: translateX(-100px);
+
+	&.Shown {
+		opacity: 1;
+		transform: translateX(0);
+	}
+
+	&.Transition {
+		transition: v.$tr-lg;
+		@for $i from 2 through 4 {
+			&:nth-child(#{$i}) {
+				transition-delay: #{$i * 75}ms;
+			}
+		}
+	}
+
+	&.Open {
+		flex:1;
+	}
+}
+
+.TaskCards {
+	flex: 1;
+	z-index: 0;
+	position: relative;
+	display: flex;
+	justify-content: center;
+	flex-wrap: wrap;
+	align-content: start;
+	width: 100%;
+}
+
+.TitleBox {
+	z-index: 1;
+	position: sticky;
+	background: linear-gradient(v.$c-grey 50%, v.$c-trans);
+	top: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 80px;
+	transition: v.$tr-md;
+	h3 {
+		transition: v.$tr-md;
+	}
+	&.Open {
+		h3 {
+			scale: 2;
+		}
+		height: 200px;
+	}
+	&.Hidden {
+		h3 {
+			rotate: 90deg;
+		}
+		height: 100%;
+	}
+}
+
+.ScrollPadding {
+	width: 100%;
+	height: 1px;
+}

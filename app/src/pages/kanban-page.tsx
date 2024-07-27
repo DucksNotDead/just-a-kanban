@@ -14,12 +14,14 @@ export function KanbanPage() {
 
 	const handleResize = useCallback(
 		(width: number | null) => {
-			if (width && width < 1000) {
-				setOneStepMode(() => true);
-				setChosenStep(() => steps[0]?.id ?? null);
-			} else {
-				setOneStepMode(() => false);
-				setChosenStep(() => null);
+			if (width) {
+				if (width < 1000) {
+					setOneStepMode(() => true);
+					setChosenStep(() => steps[0]?.id ?? null);
+				} else {
+					setOneStepMode(() => false);
+					setChosenStep(() => null);
+				}
 			}
 		},
 		[steps],
@@ -37,6 +39,7 @@ export function KanbanPage() {
 
 	const { width, ref } = useResizeDetector({
 		onResize: (payload) => handleResize(payload.width),
+		handleHeight: false,
 	});
 
 	useEffect(() => {

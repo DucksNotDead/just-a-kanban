@@ -1,5 +1,3 @@
-import { Card } from 'entities/Card';
-import { Colors } from 'constants/Colors';
 import {
 	Button,
 	Checkbox,
@@ -49,44 +47,38 @@ export function LoginForm(props: IProps) {
 	}, [form, allFields, regMode]);
 
 	return (
-		<Card
-			color={Colors.primary}
-			backgroundColor={Colors.white}
-			className={props.success ? Styles.LoginSuccess : ''}
+		<Flex
+			vertical
+			align={'center'}
+			className={`${Styles.Container} ${props.success? Styles.LoginSuccess : ''}`}
 		>
-			<Flex
-				vertical
-				align={'center'}
-				className={Styles.Container}
-			>
-				<Title main>вход</Title>
-				<Form form={form} className={Styles.Form}>
-					{formFields(regMode).map((field) =>
-						field.hidden ? null : (
-							<Form.Item
-								key={field.name}
-								name={field.name}
-								rules={validator(field.name === 'password')}
-							>
-								<Input placeholder={field.label} />
-							</Form.Item>
-						),
-					)}
-					<Space>
-						<Button
-							disabled={!validated}
-							type={'primary'}
-							onClick={handleSubmit}
-							loading={props.pending}
+			<Title main>вход</Title>
+			<Form form={form} className={Styles.Form}>
+				{formFields(regMode).map((field) =>
+					field.hidden ? null : (
+						<Form.Item
+							key={field.name}
+							name={field.name}
+							rules={validator(field.name === 'password')}
 						>
-							{regMode ? 'зарегистрироваться' : 'войти'}
-						</Button>
-						<Checkbox onChange={handleCheckboxChange}>
-							я новенький
-						</Checkbox>
-					</Space>
-				</Form>
-			</Flex>
-		</Card>
+							<Input placeholder={field.label} type={field.name}/>
+						</Form.Item>
+					),
+				)}
+				<Space>
+					<Button
+						disabled={!validated}
+						type={'primary'}
+						onClick={handleSubmit}
+						loading={props.pending}
+					>
+						{regMode ? 'зарегистрироваться' : 'войти'}
+					</Button>
+					<Checkbox onChange={handleCheckboxChange}>
+						я новенький
+					</Checkbox>
+				</Space>
+			</Form>
+		</Flex>
 	);
 }

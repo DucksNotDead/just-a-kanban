@@ -14,9 +14,12 @@ export interface ITask {
 	id: number;
 	title: string;
 	body: object;
-	starts: string|null
-	deadline: string|null
-	step: number
-	stepReason: string | null
-	inBasket: boolean
+	starts: string | null;
+	deadline: string | null;
+	step: number;
+	category: number | null;
+	stepReason: string | null;
+	inBasket: boolean;
+	created: string;
+	updated: string;
 }
