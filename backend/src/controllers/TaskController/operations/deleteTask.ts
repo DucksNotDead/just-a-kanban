@@ -12,5 +12,5 @@ export async function deleteTask(request: Request, response: Response) {
 
 	await db.tasks().delete({ id });
 
-	return sendSuccess(response, { deletedId: id });
+	return sendSuccess(response, { data: id });
 }

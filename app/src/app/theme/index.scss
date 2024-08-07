@@ -1,6 +1,6 @@
 @import 'normalize.css';
 @import 'font.css';
-@import 'variables';
+@import 'shared/theme/variables';
 
 html,
 body,
@@ -79,4 +79,13 @@ p {
 	line-height: clamp(1.15rem, 1.0857rem + 0.3214vw, 1.6rem);
 	font-weight: 300;
 	color: $c-dark-grey;
+}
+
+div:has(.ant-modal-root) {
+	position: relative;
+	z-index: 2;
+}
+
+.ct {
+	z-index: 3;
 }

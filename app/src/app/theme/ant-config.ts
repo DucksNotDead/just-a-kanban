@@ -1,14 +1,14 @@
 import { ThemeConfig } from "antd";
-import { Colors } from 'constants/Colors';
 
 const BASE_CONTROL_OPTIONS = {
-	borderRadius: 4,
-	controlHeight: 32,
+	borderRadius: 999,
+	controlHeight: 34,
 };
 
 export const AntConfig: ThemeConfig = {
 	token: {
-		colorPrimary: Colors.primary
+		colorPrimary: 'rgb(39, 158, 249)',
+		colorText: 'rgb(85, 105, 122)'
 	},
 	components: {
 		Button: {
@@ -16,6 +16,7 @@ export const AntConfig: ThemeConfig = {
 		},
 		Input: {
 			...BASE_CONTROL_OPTIONS,
+			borderRadius: 999,
 		},
 		Select: {
 			...BASE_CONTROL_OPTIONS,

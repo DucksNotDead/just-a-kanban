@@ -1,0 +1,20 @@
+@use 'shared/theme/variables' as v;
+
+.Modal {
+  &Content {
+    min-height: 400px;
+    max-height: 700px;
+    display: flex;
+    flex-direction: column;
+    padding: 0!important;
+    overflow: hidden;
+  }
+  &Body {
+    flex: 1;
+    display: flex;
+  }
+}
+
+.Hidden {
+  display: none;
+}

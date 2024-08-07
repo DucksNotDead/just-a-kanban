@@ -7,5 +7,5 @@ export async function auth(request: Request, response: Response) {
 	if (!user) {
 		return sendError(response, 401);
 	}
-	return sendSuccess(response, { user });
+	return sendSuccess(response, { data: user });
 }

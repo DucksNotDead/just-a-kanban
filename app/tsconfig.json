@@ -18,11 +18,11 @@
 		"noEmit": true,
 		"jsx": "react-jsx",
 		"paths": {
-			"app/*": ["app/*"],
-			"constants/*": ["constants/*"],
+			"shared": ["shared/index"],
 			"entities/*": ["entities/*"],
 			"widgets/*": ["widgets/*"],
-			"hooks/*": ["hooks/*"]
+			"features/*": ["features/*"],
+			"pages/*": ["pages/*"]
 		}
 	},
 	"include": ["src", "declare.d.ts"]

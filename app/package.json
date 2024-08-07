@@ -3,6 +3,7 @@
 	"version": "0.1.0",
 	"private": true,
 	"dependencies": {
+		"@ant-design/icons": "^5.4.0",
 		"@testing-library/jest-dom": "^5.17.0",
 		"@testing-library/react": "^13.4.0",
 		"@testing-library/user-event": "^13.5.0",
@@ -11,7 +12,7 @@
 		"@types/react": "^18.3.3",
 		"@types/react-dom": "^18.3.0",
 		"antd": "^5.19.2",
-		"framer-motion": "^11.3.8",
+		"dayjs": "^1.11.12",
 		"module-alias": "^2.2.3",
 		"node-sass": "^7.0.3",
 		"react": "^18.3.1",
@@ -60,10 +61,10 @@
 		"typescript-eslint": "^7.16.0"
 	},
 	"_moduleAliases": {
-		"app": "build/app/*",
-		"constants": "build/constants/*",
+		"shared": "build/shared/index",
 		"entities": "build/entities/*",
 		"widgets": "build/widgets/*",
-		"hooks": "build/hooks/*"
+		"features": "build/features/*",
+		"pages": "build/pages/*"
 	}
 }

@@ -15,5 +15,5 @@ export async function createCategory(request: Request, response: Response) {
 		.save(db.categories().create({ name, color, user }));
 	delete newCategory.user;
 
-	return sendSuccess(response, { newCategory });
+	return sendSuccess(response, { data: newCategory });
 }

@@ -1,6 +1,6 @@
 import { IAppController } from "../../global/types";
 import { getUserTasks } from "./operations/getUserTasks";
-import { getFullTask } from "./operations/getFullTask";
+import { getTaskBody } from "./operations/getTaskBody";
 import { createTask } from "./operations/createTask";
 import { updateTask } from "./operations/updateTask";
 import { moveTask } from "./operations/moveTask";
@@ -12,7 +12,7 @@ import { TaskMoveValidator } from "./validators/TaskMoveValidator";
 
 export const TaskController: IAppController = {
 	"get|/tasks": { action: getUserTasks },
-	"get|/task": { action: getFullTask, validator: IdValidator },
+	"get|/task-body": { action: getTaskBody, validator: IdValidator },
 	"post|/tasks": { action: createTask, validator: TaskValidator },
 	"put|/tasks": { action: updateTask, validator: FullTaskValidator },
 	"put|/task-move": { action: moveTask, validator: TaskMoveValidator },

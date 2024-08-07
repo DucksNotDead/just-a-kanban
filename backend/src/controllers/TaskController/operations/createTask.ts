@@ -25,7 +25,7 @@ export async function createTask(request: Request, response: Response) {
 		task.category = null;
 	}
 
-	task.step = (await db.steps().find({ take: 1 }))[0];
+	task.step = await db.steps().findOne({})
 
 	const currentDate = getCurrentDate();
 	task.updated = currentDate;
@@ -35,5 +35,5 @@ export async function createTask(request: Request, response: Response) {
 
 	delete newTask.user;
 
-	return sendSuccess(response, { newTask });
+	return sendSuccess(response, { data: newTask });
 }

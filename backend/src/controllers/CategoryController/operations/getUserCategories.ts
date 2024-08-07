@@ -7,5 +7,5 @@ export async function getUserCategories(request: Request, response: Response) {
 
 	const categories = await db.categories().findBy({ user });
 
-	return sendSuccess(response, { categories });
+	return sendSuccess(response, { data: categories });
 }

@@ -7,6 +7,8 @@ export function getCurrentDate(): string {
 	const date = [d.getFullYear(), d.getMonth() + 1, d.getDate()]
 		.map(format)
 		.join('-');
-	const time = [d.getHours(), d.getMinutes(), d.getSeconds()].join(':');
+	const time = [d.getHours(), d.getMinutes(), d.getSeconds()]
+		.map(format)
+		.join(':');
 	return date + 'T' + time;
 }

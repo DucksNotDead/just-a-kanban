@@ -1,0 +1,8 @@
+@use '../../../shared/theme/variables' as v;
+
+.KanbanSteps {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  gap: v.$sm;
+}

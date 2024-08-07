@@ -20,7 +20,7 @@ export async function updateCategory(request: Request, response: Response) {
 		const updated = await db.categories().save(candidate);
 
 		return sendSuccess(response, {
-			category: updated,
+			data: updated,
 		});
 	} catch {
 		return sendError(response, 500);

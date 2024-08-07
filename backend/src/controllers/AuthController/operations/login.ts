@@ -21,8 +21,10 @@ export async function login(
 	delete candidate.password;
 
 	return sendSuccess(response, {
-		token: createToken(username),
-		user: candidate,
-		redirected: redirected,
+		data: {
+			token: createToken(username),
+			user: candidate,
+			redirected: redirected,
+		}
 	});
 }

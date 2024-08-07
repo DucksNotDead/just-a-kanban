@@ -30,6 +30,6 @@ export async function moveTask(request: Request, response: Response) {
 	candidate.updated = getCurrentDate()
 	const updated = await db.tasks().save(candidate);
 	return sendSuccess(response, {
-		task: updated,
+		data: updated,
 	});
 }

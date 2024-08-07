@@ -1,0 +1,8 @@
+@use "shared/theme/variables";
+$text-colors: 'black', 'primary', 'secondary', 'dark-grey';
+
+@each $color in $text-colors {
+	.Color-#{$color} {
+		color: variables['$c-' + color];
+	}
+}

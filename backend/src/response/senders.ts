@@ -14,7 +14,7 @@ export function sendError(
 	});
 }
 
-export function sendSuccess(res: Response, body: Record<string, any>) {
+export function sendSuccess(res: Response, body: Record<'data', any>) {
 	return res.status(200).json({
 		success: true,
 		...body,

@@ -4,6 +4,6 @@ import { sendSuccess } from "../../../response/senders";
 
 export async function getSteps(request: Request, response: Response) {
 	return sendSuccess(response, {
-		steps: await db.steps().find(),
+		data: await db.steps().find(),
 	});
 }

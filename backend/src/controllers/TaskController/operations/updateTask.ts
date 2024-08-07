@@ -20,7 +20,7 @@ export async function updateTask(request: Request, response: Response) {
 
 		candidate.updated = getCurrentDate();
 
-		await db.tasks().save(candidate);
+		await db.tasks().update(candidate.id, candidate);
 
 		const updated = await db.tasks().findOne({
 			where: { id: task.id },
@@ -31,9 +31,10 @@ export async function updateTask(request: Request, response: Response) {
 		});
 
 		return sendSuccess(response, {
-			task: updated,
+			data: updated,
 		});
-	} catch {
+	} catch (e) {
+		console.log(e);
 		return sendError(response, 500);
 	}
 }

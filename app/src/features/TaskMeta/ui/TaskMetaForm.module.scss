@@ -1,0 +1,12 @@
+@use 'shared/theme/variables' as v;
+
+.TaskMetaForm {
+  :global {
+    .ant-form-item-row {
+      flex-wrap: nowrap!important;
+    }
+    .ant-form-item-control-input-content, .ant-form-item-control-input {
+      width: fit-content!important;
+    }
+  }
+}
