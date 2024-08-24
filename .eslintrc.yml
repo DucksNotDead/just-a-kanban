@@ -1,0 +1,33 @@
+extends:
+  - react-app
+rules:
+    curly: error
+    no-console: warn
+    import/no-anonymous-default-export: off
+    import/newline-after-import: 1
+    import/order:
+        - error
+        - groups:
+              - [builtin]
+              - [external]
+              - [internal]
+              - [parent, sibling]
+              - [index]
+          pathGroups:
+              - pattern: '@{src,main}/**'
+                group: parent
+                position: before
+              - pattern: './**.{css,scss}'
+                group: sibling
+                position: after
+          pathGroupsExcludedImportTypes:
+              - builtin
+          alphabetize:
+              order: asc
+              caseInsensitive: true
+          newlines-between: always
+    no-duplicate-imports: error
+    react-hooks/exhaustive-deps: off
+    sort-imports:
+        - error
+        - ignoreDeclarationSort: true

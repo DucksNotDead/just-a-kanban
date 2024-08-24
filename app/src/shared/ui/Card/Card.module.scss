@@ -1,0 +1,16 @@
+.Card {
+  display: flex;
+  flex-direction: column;
+  align-self: flex-start;
+  width: clamp(280px, 100%, 400px);
+  gap: var(--sm);
+  padding: var(--md);
+  background-color: var(--c-dark-grey);
+  box-shadow: 0 0 5px 1px rgba(44, 44, 44, 0.5);
+  border-radius: var(--md);
+  transition: var(--tr-sm);
+
+  &:hover {
+    scale: 1.02;
+  }
+}

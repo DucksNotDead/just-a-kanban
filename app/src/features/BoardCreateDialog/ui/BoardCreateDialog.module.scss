@@ -1,0 +1,26 @@
+.Dialog {
+  :global {
+    .ant-list-empty-text {
+      display: none;
+    }
+  }
+}
+
+.Inputs {
+  display: flex;
+  flex-direction: column;
+  margin: var(--lg) 0;
+  gap: var(--md);
+  :global {
+    .ant-list-empty-text {
+      display: none;
+    }
+  }
+}
+
+.UserDescription {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 500;
+  margin-top: var(--lg);
+}

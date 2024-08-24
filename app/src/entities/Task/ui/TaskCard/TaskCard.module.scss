@@ -1,8 +1,0 @@
-@use '../../../../shared/theme/variables' as v;
-
-.TaskCard {
-  width: clamp(100px, 100%, 320px);
-  min-height: 80px;
-  background-color: v.$c-white;
-  border-radius: v.$md;
-}

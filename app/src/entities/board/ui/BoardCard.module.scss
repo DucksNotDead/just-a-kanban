@@ -1,0 +1,14 @@
+.BoardCardHeader {
+  display: flex;
+  justify-content: space-between;
+
+  & div:first-child {
+    align-content: center;
+  }
+}
+
+.BoardCardContainer {
+  display: flex;
+  align-items: center;
+  gap: var(--md);
+}

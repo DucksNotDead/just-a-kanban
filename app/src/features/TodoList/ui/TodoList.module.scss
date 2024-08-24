@@ -1,9 +1,0 @@
-@use 'shared/theme/variables' as v;
-
-.TodoList {
-    &Item{
-        display: flex;
-        gap: v.$base;
-        padding: 0 v.$lg;
-    }
-}

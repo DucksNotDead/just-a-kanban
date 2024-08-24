@@ -1,0 +1,23 @@
+.Modal {
+  :global {
+    .ant-modal-footer button:first-child {
+      display: none;
+    }
+    .ant-list-item-meta-avatar {
+      align-self: center;
+    }
+  }
+}
+
+.Header {
+  display: flex;
+  align-items: center;
+  gap: var(--lg);
+}
+
+.UserItem {
+  display: flex;
+  align-items: center;
+  gap: var(--lg);
+  padding: var(--sm);
+}
