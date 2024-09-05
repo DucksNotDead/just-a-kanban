@@ -1,20 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import genSlug from 'limax';
-import {
-  DeepPartial,
-  EntityManager,
-  FindOptionsWhere,
-  In,
-  Repository,
-  SelectQueryBuilder,
-} from 'typeorm';
+import { DeepPartial, EntityManager, FindOptionsWhere, In, Repository, SelectQueryBuilder } from 'typeorm';
 
 import { Board } from './boards.model';
 import { BoardChangeUsersDto } from './dto/board-change-users-dto';
 import { BoardCreateDto } from './dto/board-create-dto';
 import { Exception } from '../../config/exception';
-import { Sprint } from '../sprints/sprints.model';
 import { User } from '../users/users.model';
 
 @Injectable()
@@ -23,7 +15,6 @@ export class BoardsService {
     @InjectEntityManager() private readonly manager: EntityManager,
     @InjectRepository(Board) private readonly boards: Repository<Board>,
     @InjectRepository(User) private readonly users: Repository<User>,
-    @InjectRepository(Sprint) private readonly sprints: Repository<Sprint>,
   ) {}
 
   async getAll(userId: number) {
@@ -45,14 +36,20 @@ export class BoardsService {
       where: { slug },
       relations: ['users', 'managers'],
     });
-    if (!board) {throw Exception.NotFound('board');}
+    if (!board) {
+      throw Exception.NotFound('board');
+    }
     const { users, managers } = board;
 
     return { users, managers };
   }
 
+  async getBySlugForAccess(slug: string) {
+    return await this.getBy({ slug });
+  }
+
   async getBySprint(id: number) {
-    return await this.getBy({ sprints: { id } });
+    return await this.getBy({ slices: { id } });
   }
 
   async getByTask(id: number) {
@@ -76,7 +73,9 @@ export class BoardsService {
     const slug = this.genSlug(dto.name);
 
     const candidate = await this.boards.findOneBy({ slug });
-    if (candidate) {throw Exception.Exist('board');}
+    if (candidate) {
+      throw Exception.Exist('board');
+    }
 
     const { users, managers } = await this.boardUsers(
       dto.users,
@@ -99,10 +98,14 @@ export class BoardsService {
 
   async changeName(slug: string, name: string) {
     const candidate = await this.boards.findOneBy({ slug });
-    if (!candidate) {throw Exception.NotFound('board');}
+    if (!candidate) {
+      throw Exception.NotFound('board');
+    }
 
     const anotherCandidate = await this.boards.findOneBy({ name });
-    if (anotherCandidate) {throw Exception.Exist('board');}
+    if (anotherCandidate) {
+      throw Exception.Exist('board');
+    }
 
     candidate.name = name;
     candidate.slug = this.genSlug(name);
@@ -137,7 +140,10 @@ export class BoardsService {
   }
 
   async delete(boardSlug: string) {
-    const board = await this.getBy({ slug: boardSlug });
+    const board = await this.boards.findOne({
+      where: { slug: boardSlug },
+      relations: { tasks: true, slices: true }
+    })
 
     const id = board.id;
 
@@ -197,8 +203,14 @@ export class BoardsService {
     return { managers, users };
   }
 
-  private async getBy(where: FindOptionsWhere<Board>) {
-    return await this.boards.findOneBy(where);
+  private async getBy(
+    where: FindOptionsWhere<Board>,
+    loadUsers: boolean = true,
+  ) {
+    return await this.boards.findOne({
+      where,
+      relations: loadUsers ? { users: true, managers: true } : undefined,
+    });
   }
 
   private genSlug(name: string) {

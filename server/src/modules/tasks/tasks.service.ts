@@ -1,27 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { response } from 'express';
 import { Repository } from 'typeorm';
 
 import { TaskCreateDto } from './dto/task-create-dto';
-import { TaskMetaChangeDto } from './dto/task-meta-change-dto';
 import { Task } from './tasks.model';
 import { Exception } from '../../config/exception';
 import { Board } from '../boards/boards.model';
+import { SlicesService } from '../slices/slices.service';
 import { SocketService } from '../socket/socket.service';
-import { SprintsService } from '../sprints/sprints.service';
 import { StepsService } from '../steps/steps.service';
 import { TodosService } from '../todos/todos.service';
 import { User } from '../users/users.model';
 import { UsersService } from '../users/users.service';
-
 
 @Injectable()
 export class TasksService {
   constructor(
     @InjectRepository(Task) private readonly tasks: Repository<Task>,
     private readonly usersService: UsersService,
-    private readonly sprintsService: SprintsService,
+    private readonly slicesService: SlicesService,
     private readonly stepsService: StepsService,
     private readonly todosService: TodosService,
     private readonly socketService: SocketService,
@@ -30,8 +27,8 @@ export class TasksService {
   async getByUserBoard(board: Board, user: User): Promise<Task[]> {
     return await this.tasks.find({
       where: board.managers.find((m) => m.id === user.id)
-        ? { board }
-        : { board, responsible: user },
+        ? { board: { id: board.id } }
+        : { board: { id: board.id }, responsible: { id: user.id } },
       loadRelationIds: true,
     });
   }
@@ -41,7 +38,9 @@ export class TasksService {
       where: { id },
       relations: ['responsible', 'step', 'reviewer'],
     });
-    if (!candidate) {throw Exception.NotFound('task');}
+    if (!candidate) {
+      throw Exception.NotFound('task');
+    }
     const { responsible, reviewer, step } = candidate;
     return { responsible, reviewer, step };
   }
@@ -51,17 +50,21 @@ export class TasksService {
       where: { id },
       relations: ['responsible'],
     });
-    if (!candidate) {throw Exception.NotFound('task');}
+    if (!candidate) {
+      throw Exception.NotFound('task');
+    }
     return candidate;
   }
 
   async create(dto: TaskCreateDto & { board: Board }, userId: number) {
     const candidate = await this.tasks.findOneBy({ title: dto.title });
-    if (candidate) {throw Exception.Exist('task');}
+    if (candidate) {
+      throw Exception.Exist('task');
+    }
 
-    const responsible = await this.usersService.getById(dto.responsibleId);
+    const responsible = await this.usersService.getById(dto.responsible);
 
-    const sprint = await this.sprintsService.getById(dto.sprintId);
+    const slice = await this.slicesService.getById(dto.slice);
 
     const step = await this.stepsService.getFirst();
     const boardTasks = await this.getByBoard(dto.board);
@@ -69,7 +72,7 @@ export class TasksService {
     const newTask = this.tasks.create({
       ...dto,
       step,
-      sprint,
+      slice,
       responsible,
       order: boardTasks.length,
       created: this.getCurrentDate(),
@@ -83,7 +86,10 @@ export class TasksService {
       {
         from: userId,
         event: 'taskCreate',
-        content: await this.tasks.findOneBy({ id: newTask.id }),
+        content: await this.tasks.findOne({
+          where: { id: newTask.id },
+          loadRelationIds: true,
+        }),
       },
       dto.board.slug,
       responsible.id,
@@ -92,7 +98,9 @@ export class TasksService {
 
   async changeOrder(to: number, id: number, board: Board, userId: number) {
     to = Number(to);
-    if (to < 0) {throw Exception.BadRequest('order < 0');}
+    if (to < 0) {
+      throw Exception.BadRequest('order < 0');
+    }
 
     const task = await this.tasks.findOne({
       where: { id },
@@ -101,11 +109,14 @@ export class TasksService {
 
     const boardTasks = await this.getByBoard(board);
 
-    if (to > boardTasks.length - 1)
-      {throw Exception.BadRequest('order > step tasks count');}
+    if (to > boardTasks.length - 1) {
+      throw Exception.BadRequest('order > step tasks count');
+    }
 
     const from = task.order;
-    if (to === from) {throw Exception.BadRequest('orders the same');}
+    if (to === from) {
+      throw Exception.BadRequest('orders the same');
+    }
 
     const [implementer, min, max] = from < to ? [-1, from, to] : [1, to, from];
 
@@ -143,11 +154,17 @@ export class TasksService {
       where: { id },
       relations: ['reviewer', 'step', 'responsible'],
     });
-    if (!task) {throw Exception.NotFound('task');}
-    if (task.step.id !== 3)
-      {throw Exception.BadRequest('Только для задач на проверке');}
-    if (task.reviewer && task.reviewer.id === user.id) {task.reviewer = null;}
-    else {task.reviewer = user;}
+    if (!task) {
+      throw Exception.NotFound('task');
+    }
+    if (task.step.id !== 3) {
+      throw Exception.BadRequest('Только для задач на проверке');
+    }
+    if (task.reviewer && task.reviewer.id === user.id) {
+      task.reviewer = null;
+    } else {
+      task.reviewer = user;
+    }
     this.update(task);
     await this.tasks.update(id, task);
 
@@ -170,10 +187,13 @@ export class TasksService {
   ) {
     to = Number(to);
     const task = await this.getTaskForChangeStep(id, to);
-    if (![1, 2, 3].includes(to)) {throw Exception.AccessDenied();}
+    if (![1, 2, 3].includes(to)) {
+      throw Exception.AccessDenied();
+    }
 
-    if (to === 2 && (await this.todosService.hasUnchecked(id)))
-      {throw Exception.BadRequest('task undone');}
+    if (to === 2 && (await this.todosService.hasUnchecked(id))) {
+      throw Exception.BadRequest('task undone');
+    }
     await this.changeStep(to, task, boardSlug, userId);
   }
 
@@ -185,37 +205,46 @@ export class TasksService {
   ) {
     to = Number(to);
     const task = await this.getTaskForChangeStep(id, to, true);
-    if (![1, 3, 4].includes(to)) {throw Exception.AccessDenied();}
+    if (![1, 3, 4].includes(to)) {
+      throw Exception.AccessDenied();
+    }
 
-    if (to === 4 && !task.reviewer) {throw Exception.NotFound('reviewer');}
+    if (to === 4 && !task.reviewer) {
+      throw Exception.NotFound('reviewer');
+    }
     if (to === 1) {
       const todos = await this.todosService.getByTask(task.id);
-      if (todos.length && !(await this.todosService.hasUnchecked(id)))
-        {throw Exception.NotFound('unchecked todos');}
-      if (task.reviewer) {task.reviewer = null;}
+      if (todos.length && !(await this.todosService.hasUnchecked(id))) {
+        throw Exception.NotFound('unchecked todos');
+      }
+      if (task.reviewer) {
+        task.reviewer = null;
+      }
     }
     await this.changeStep(to, task, boardSlug, user.id);
   }
 
   async changeMeta(
-    dto: TaskMetaChangeDto,
+    dto: Partial<TaskCreateDto>,
     id: number,
     boardSlug: string,
     userId: number,
   ) {
     const task = await this.tasks.findOne({
       where: { id },
-      relations: ['responsible', 'sprint'],
+      relations: ['responsible', 'slice'],
     });
-    if (!task) {throw Exception.NotFound('task');}
-    const { responsibleId, sprintId } = dto;
+    if (!task) {
+      throw Exception.NotFound('task');
+    }
+    const { responsible, slice } = dto;
 
-    if (responsibleId) {
-      task.responsible = await this.usersService.getById(responsibleId);
+    if (responsible) {
+      task.responsible = await this.usersService.getById(responsible);
     }
 
-    if (sprintId) {
-      task.sprint = await this.sprintsService.getById(sprintId);
+    if (slice) {
+      task.slice = await this.slicesService.getById(slice);
     }
 
     this.update(task);
@@ -237,14 +266,16 @@ export class TasksService {
       where: { id },
       relations: ['responsible'],
     });
-    if (!task) {throw Exception.NotFound('task');}
+    if (!task) {
+      throw Exception.NotFound('task');
+    }
 
-    await this.tasks.delete(id);
+    await this.tasks.remove(task);
     this.socketService.send(
       {
         from: userId,
         event: 'taskDelete',
-        content: { id },
+        content: id,
       },
       boardSlug,
       task.responsible.id,
@@ -279,8 +310,12 @@ export class TasksService {
       where: { id },
       relations: reviewer ? ['step', 'reviewer'] : ['step'],
     });
-    if (!task) {throw Exception.NotFound('task');}
-    if (task.step.id === to) {throw Exception.BadRequest('step === prev step');}
+    if (!task) {
+      throw Exception.NotFound('task');
+    }
+    if (task.step.id === to) {
+      throw Exception.BadRequest('step === prev step');
+    }
     return task;
   }
 
@@ -291,7 +326,9 @@ export class TasksService {
     userId: number,
   ) {
     const step = await this.stepsService.getById(to);
-    if (!step) {throw Exception.NotFound('step');}
+    if (!step) {
+      throw Exception.NotFound('step');
+    }
 
     task.step = step;
     this.update(task);

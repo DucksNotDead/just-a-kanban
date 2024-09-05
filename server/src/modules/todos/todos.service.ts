@@ -2,9 +2,8 @@ import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { TodoCreateDto } from './dto/todo-create-dto';
+import { TodoChangeDto } from './dto/todo-change-dto';
 import { Todo } from './todos.model';
-import { TodosModule } from './todos.module';
 import { Exception } from '../../config/exception';
 import { SocketService } from '../socket/socket.service';
 import { TasksService } from '../tasks/tasks.service';
@@ -24,34 +23,48 @@ export class TodosService {
 
   async getById(id: number) {
     const candidate = await this.todos.findOneBy({ id });
-    if (!candidate) {throw Exception.NotFound('todo');}
+    if (!candidate) {
+      throw Exception.NotFound('todo');
+    }
   }
 
-  async create(
-    dto: TodoCreateDto,
+  async change(
+    { todos }: TodoChangeDto,
     taskId: number,
     boardSlug: string,
     userId: number,
   ) {
-    const candidate = await this.todos.findOneBy({
-      task: { id: taskId },
-      label: dto.label,
-    });
-    if (candidate) {throw Exception.Exist('todo');}
-
     const task = await this.tasksService.getById(taskId);
-    const newTodo = this.todos.create({
-      label: dto.label,
-      checked: false,
-      task,
+
+    const currentTodos = await this.todos.findBy({
+      task: { id: taskId },
     });
-    await this.todos.save(newTodo);
+
+    const oldTodos: Todo[] = [];
+    for (const todo of todos) {
+      if (!(todo instanceof Todo)) {
+        const newTodo = this.todos.create({
+          label: todo.label,
+          checked: false,
+          task,
+        });
+        await this.todos.save(newTodo);
+      } else {
+        oldTodos.push(todo);
+      }
+    }
+
+    for (const currentTodo of currentTodos) {
+      if (!oldTodos.find((ot) => ot.id === currentTodo.id)) {
+        await this.todos.remove(currentTodo);
+      }
+    }
 
     this.socketService.send(
       {
         from: userId,
-        event: 'todoCreate',
-        content: { taskId },
+        event: 'taskTodosChange',
+        content: { taskId, todos },
       },
       boardSlug,
       task.responsible.id,
@@ -68,22 +81,7 @@ export class TodosService {
       {
         from: userId,
         event: 'todoToggle',
-        content: { id },
-      },
-      boardSlug,
-      task.responsible.id,
-    );
-  }
-
-  async delete(id: number, boardSlug: string, userId: number) {
-    const todo = await this.getOne(id);
-    const task = await this.tasksService.getById(todo.task.id);
-    await this.todos.delete(id);
-    this.socketService.send(
-      {
-        from: userId,
-        event: 'todoDelete',
-        content: { id },
+        content: { taskId: task.id, id },
       },
       boardSlug,
       task.responsible.id,
@@ -99,7 +97,9 @@ export class TodosService {
       where: { id },
       relations: ['task'],
     });
-    if (!candidate) {throw Exception.NotFound('todo');}
+    if (!candidate) {
+      throw Exception.NotFound('todo');
+    }
     return candidate;
   }
 }

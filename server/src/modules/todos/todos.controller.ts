@@ -1,7 +1,7 @@
-import { Body, Controller, Delete, Get, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Put } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
-import { TodoCreateDto } from './dto/todo-create-dto';
+import { TodoChangeDto } from './dto/todo-change-dto';
 import { ReqTodoId } from './todo.decorator';
 import { TODO_ID_KEY } from './todos.const';
 import { TodosService } from './todos.service';
@@ -29,19 +29,19 @@ export class TodosController {
     return this.service.getByTask(id);
   }
 
-  @ApiMethod('Create todo in task (board manager access)', {
+  @ApiMethod('Change todos in task (board manager access)', {
     params: [TASK_ID_KEY],
-    body: TodoCreateDto,
+    body: TodoChangeDto,
   })
   @BoardAccess(true)
-  @Post(`:${TASK_ID_KEY}`)
-  create(
+  @Put(`:${TASK_ID_KEY}`)
+  change(
     @ReqTaskId() taskId: number,
-    @Body() dto: TodoCreateDto,
+    @Body() dto: TodoChangeDto,
     @ReqBoard() board: Board,
     @ReqUser() user: User,
   ) {
-    return this.service.create(dto, taskId, board.slug, user.id);
+    return this.service.change(dto, taskId, board.slug, user.id);
   }
 
   @ApiMethod('Toggle todo (task access)', {
@@ -55,18 +55,5 @@ export class TodosController {
     @ReqUser() user: User,
   ) {
     return this.service.toggle(id, board.slug, user.id);
-  }
-
-  @ApiMethod('Delete todo (board manager access)', {
-    params: [TASK_ID_KEY, TODO_ID_KEY],
-  })
-  @BoardAccess(true)
-  @Delete(`:${TASK_ID_KEY}/:${TODO_ID_KEY}`)
-  delete(
-    @ReqTodoId() id: number,
-    @ReqBoard() board: Board,
-    @ReqUser() user: User,
-  ) {
-    return this.service.delete(id, board.slug, user.id);
   }
 }

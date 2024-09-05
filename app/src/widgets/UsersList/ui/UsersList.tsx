@@ -1,6 +1,5 @@
 import { App, Button, Drawer, List } from 'antd';
 import { IUser, UserAvatar, useUsersApi } from 'entities/user';
-import { UserCreateDialog } from 'features/UserCreateDialog';
 import { BadgeMinus } from 'lucide-react';
 import {
   forwardRef,
@@ -11,6 +10,8 @@ import {
 } from 'react';
 import { appMessages } from 'shared/const';
 import { IModalRef } from 'shared/types';
+
+import { UserCreateDialog } from './UserCreateDialog';
 
 import Styles from './UsersList.module.scss';
 
@@ -43,12 +44,12 @@ export const UsersList = forwardRef<IModalRef, IProps>(({ onDelete }, ref) => {
 
   const onCreateClick = useCallback(() => {
     createDialogRef.current?.open();
-  }, [createDialogRef.current]);
+  }, []);
 
   const onDeleteClick = useCallback(
     (userId: number) => {
       modal.confirm({
-        title: `Удалить пользователя ${users.find((u) => u.id === userId)?.name ?? ""}?`,
+        title: `Удалить пользователя ${users.find((u) => u.id === userId)?.name ?? ''}?`,
         content: appMessages.confirm.delete,
         okButtonProps: { danger: true },
         okText: 'Удалить',
@@ -80,6 +81,7 @@ export const UsersList = forwardRef<IModalRef, IProps>(({ onDelete }, ref) => {
   useImperativeHandle(ref, () => ({
     open,
     close: () => setIsOpen(() => false),
+    isOpen,
   }));
 
   return (

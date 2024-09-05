@@ -1,0 +1,20 @@
+.TodoItem {
+  width: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.TodoTextAreaBlock {
+  width: 100%;
+  textarea:disabled {
+    color: var(--c-light-grey);
+  }
+}
+
+.TodoPoint {
+  width: 8px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background-color: var(--c-green);
+}

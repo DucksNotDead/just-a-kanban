@@ -1,0 +1,24 @@
+.Select {
+  &Option {
+    display: flex;
+    align-items: center;
+    gap: var(--sm);
+    & * {
+      flex-shrink: 0;
+    }
+  }
+  &Menu {
+    &Header {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      &:not(:empty) {
+        padding-bottom: var(--sm);
+      }
+    }
+    &Items {
+      position: relative;
+      z-index: 1;
+    }
+  }
+}

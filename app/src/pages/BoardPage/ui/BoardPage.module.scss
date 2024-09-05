@@ -1,0 +1,15 @@
+.Board {
+  &KanbanPage {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  &Steps {
+    flex: 1;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: flex-start;
+    gap: var(--xl);
+    padding: var(--lg) var(--xl) var(--xl);
+  }
+}

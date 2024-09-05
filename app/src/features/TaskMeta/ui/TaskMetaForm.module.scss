@@ -1,0 +1,18 @@
+.TaskMetaForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lg);
+
+  &Item {
+    flex: 1;
+    margin-bottom: 0;
+    :global {
+      .ant-picker {
+        width: 100%;
+      }
+      .ant-form-item-control-input-content {
+        height: 36px
+      }
+    }
+  }
+}

@@ -1,18 +1,10 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToMany,
-  OneToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 
-import { DATA_BIG_STRING, DATA_DATE, DATA_JSON } from '../../config/db';
+import { DATA_BIG_STRING, DATA_DATE } from '../../config/db';
 import { ApiField } from '../../config/swagger';
 import { Board } from '../boards/boards.model';
 import { Comment } from '../comments/comments.model';
-import { Sprint } from '../sprints/sprints.model';
+import { Slice } from '../slices/slices.model';
 import { Step } from '../steps/steps.model';
 import { Todo } from '../todos/todos.model';
 import { User } from '../users/users.model';
@@ -66,19 +58,16 @@ export class Task {
   @JoinColumn()
   reviewer: User;
 
-  @ManyToOne(() => Sprint, (sprint) => sprint.tasks, {
-    cascade: true,
-    nullable: false,
+  @ManyToOne(() => Slice, (slice) => slice.tasks, {
+    onDelete: 'SET NULL'
   })
-  sprint: Sprint;
+  slice: Slice;
 
   @ManyToOne(() => Step, (step) => step.tasks, { nullable: false })
   step: Step;
 
   @ManyToOne(() => Board, (board) => board.tasks, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-    cascade: true,
+   onDelete: 'CASCADE'
   })
   board: Board;
 }

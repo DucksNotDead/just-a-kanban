@@ -34,3 +34,9 @@ export interface IUserContextValue {
   isLogin: boolean;
   hasToken: boolean;
 }
+
+export interface IUsersContextValue {
+  users: IUser[];
+  usersPending: boolean;
+  getUser: (id: number) => IUser|undefined;
+}

@@ -9,7 +9,10 @@ import { Request } from 'express';
 import { boardAccessFn } from './board';
 import { Exception } from '../config/exception';
 import { BoardsService } from '../modules/boards/boards.service';
-import { TASK_ID_KEY } from '../modules/tasks/tasks.const';
+import {
+  TASK_ID_KEY,
+  TASK_USER_ACCESS_KEY,
+} from '../modules/tasks/tasks.const';
 import { TasksService } from '../modules/tasks/tasks.service';
 import { USER_KEY } from '../modules/users/users.const';
 import { User } from '../modules/users/users.model';
@@ -37,7 +40,7 @@ export const TaskAccess = (
           [USER_KEY]: user,
         } = request;
 
-        const { responsible, reviewer, step } =
+        const { responsible, reviewer } =
           await this.tasksService.getForTaskAccess(Number(taskId));
 
         const isManager = await this.boardsService.isBoardUser(
@@ -46,12 +49,20 @@ export const TaskAccess = (
           true,
         );
 
+        const isResponsible = responsible.id === user.id;
+
+        const isReviewer = reviewer.id === user.id;
+
         const access =
           reviewer && lockOnReview
-            ? reviewer.id === user.id
-            : responsible.id === user.id || (!onlyForResponsible && isManager);
+            ? isReviewer
+            : isResponsible || (!onlyForResponsible && isManager);
 
-        if (!access) {throw Exception.AccessDenied();}
+        if (!access) {
+          throw Exception.AccessDenied();
+        }
+
+        request[TASK_USER_ACCESS_KEY] = { isResponsible, isReviewer };
 
         return true;
       } catch {

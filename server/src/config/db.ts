@@ -9,3 +9,5 @@ export const DATA_DATE = { length: 16 };
 export const DATA_COLOR = { length: 21 };
 
 export const DATA_JSON = { type: 'json' } as const;
+
+export const DATA_HIDDEN = { select: false, nullable: true };

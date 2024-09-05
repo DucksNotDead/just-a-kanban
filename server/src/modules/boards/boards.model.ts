@@ -8,9 +8,9 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-import { DATA_STRING } from '../../config/db';
+import { DATA_HIDDEN, DATA_STRING } from '../../config/db';
 import { ApiField } from '../../config/swagger';
-import { Sprint } from '../sprints/sprints.model';
+import { Slice } from '../slices/slices.model';
 import { Task } from '../tasks/tasks.model';
 import { User } from '../users/users.model';
 
@@ -28,27 +28,26 @@ export class Board {
   @Column({ ...DATA_STRING })
   name: string;
 
-  @ManyToMany(() => User, (user) => user.boards, { cascade: true })
+  @ManyToMany(() => User, (user) => user.boards)
   @JoinTable()
   users: User[];
 
-  @ManyToMany(() => User, (user) => user.manageBoards, { cascade: true })
+  @ManyToMany(() => User, (user) => user.manageBoards)
   @JoinTable()
   managers: User[];
 
-  @ManyToOne(() => User, (user) => user.createdBoards, {
-    cascade: true,
-    nullable: false,
-  })
+  @ManyToOne(() => User, (user) => user.createdBoards)
   createdBy: User;
 
   @OneToMany(() => Task, (task) => task.board)
   tasks: Task[];
 
-  @OneToMany(() => Sprint, (sprint) => sprint.board, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-    cascade: true,
-  })
-  sprints: Sprint[];
+  @OneToMany(() => Slice, (slice) => slice.board)
+  slices: Slice[];
+
+  @Column(DATA_HIDDEN)
+  doneTasksCount: number;
+
+  @Column(DATA_HIDDEN)
+  undoneTasksCount: number;
 }

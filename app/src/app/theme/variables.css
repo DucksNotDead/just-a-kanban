@@ -1,19 +1,21 @@
 :root {
-    --c-black: rgb(27, 27, 30);
-    --c-white: rgb(255, 255, 255);
-    --c-dark-grey: rgb(40, 40, 44);
-    --c-light-grey: rgb(197, 199, 209);
-    --c-indigo: rgb(127, 126, 255);
-    --c-green: rgb(83, 221, 108);
-    --c-rose: rgb(246, 16, 103);
-    --c-tomato: rgb(251, 77, 61);
-    --c-gold: rgb(242, 233, 78);
-    --c-azure: rgb(108, 207, 246);
+  --c-black: rgb(27, 27, 30);
+  --c-white: rgb(255, 255, 255);
+  --c-dark-grey: rgb(40, 40, 44);
+  --c-medium-grey: rgb(56, 56, 62);
+  --c-light-grey: rgb(197, 199, 209);
+  --c-indigo: rgb(127, 126, 255);
+  --c-green: rgb(83, 221, 108);
+  --c-rose: rgb(246, 16, 103);
+  --c-tomato: rgb(251, 77, 61);
+  --c-gold: rgb(242, 233, 78);
+  --c-azure: rgb(78, 167, 236);
 
-    --sm: 6px;
-    --md: calc(var(--sm) * 2);
-    --lg: calc(var(--sm) * 3);
-    --xl: calc(var(--sm) * 4);
+  --xs: 3px;
+  --sm: calc(var(--xs) * 2);
+  --md: calc(var(--sm) * 2);
+  --lg: calc(var(--sm) * 3);
+  --xl: calc(var(--sm) * 4);
 
-    --tr-sm: 200ms
+  --tr-sm: 200ms;
 }

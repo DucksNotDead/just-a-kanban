@@ -11,8 +11,8 @@ export class TaskCreateDto {
   deadline: string;
 
   @ApiField('ID')
-  responsibleId: number;
+  responsible: number;
 
   @ApiField('ID')
-  sprintId: number;
+  slice: number;
 }

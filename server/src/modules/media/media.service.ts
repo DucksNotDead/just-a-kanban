@@ -4,8 +4,6 @@ import { join } from 'path';
 import { Injectable } from '@nestjs/common';
 import fetch from 'node-fetch';
 
-import { Exception } from '../../config/exception';
-
 @Injectable()
 export class MediaService {
   private readonly path = join(__dirname, '..', '..', '..', 'media');
@@ -13,7 +11,7 @@ export class MediaService {
 
   async load(url: string) {
     try {
-      const response = await fetch(url, { timeout: 15000 });
+      const response = await fetch(url, { timeout: 20000 });
       const buffer = await response.buffer();
 
       const fileIds = await this.getFileIds();

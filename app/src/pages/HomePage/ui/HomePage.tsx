@@ -1,13 +1,15 @@
 import { App, Button } from 'antd';
-import { BoardCard, IBoardWithUsers, useBoardsApi } from 'entities/board';
+import { IBoardWithUsers, useBoardsApi } from 'entities/board';
 import { useCurrentUser } from 'entities/user';
-import { BoardCreateDialog } from 'features/BoardCreateDialog';
 import { DiamondPlus, LogOut, RotateCcw, Users } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { appMessages, appRoutes } from 'shared/const';
 import { IModalRef } from 'shared/types';
 import { UsersList } from 'widgets/UsersList';
+
+import { BoardCreateDialog } from './BoardCreateDialog';
+import { BoardEnterCard } from './BoardEnterCard';
 
 import Styles from './HomePage.module.scss';
 
@@ -66,6 +68,14 @@ export function HomePage() {
     });
   }, []);
 
+  const handleLogout = useCallback(() => {
+    modal.confirm({
+      title: 'Вы уверены, что хотите выйти?',
+      onOk: logout,
+      okText: 'Выйти'
+    })
+  }, []);
+
   useEffect(() => {
     boardsApi.getAll().then((data) => {
       if (data) {
@@ -77,7 +87,7 @@ export function HomePage() {
   return (
     <div className={Styles.HomePage}>
       <div className={Styles.AccountPanel}>
-        <Button type={'text'} onClick={logout}>
+        <Button type={'text'} onClick={handleLogout}>
           <LogOut />
         </Button>
         {!user?.isAdmin ? null : (
@@ -100,7 +110,7 @@ export function HomePage() {
       <div className={Styles.BoardsList}>
         {boards.length ? (
           boards.map((board) => (
-            <BoardCard
+            <BoardEnterCard
               key={board.id}
               board={board}
               onClick={handleBoardClick}

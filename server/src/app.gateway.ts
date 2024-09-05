@@ -11,7 +11,9 @@ import { BOARD_SLUG_KEY } from './modules/boards/boards.const';
 import { BoardsService } from './modules/boards/boards.service';
 import { SocketService } from './modules/socket/socket.service';
 
-@WebSocketGateway()
+import 'dotenv/config';
+
+@WebSocketGateway({ cors: { origin: process.env.CORS_ORIGIN } })
 export class AppGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
@@ -30,21 +32,24 @@ export class AppGateway
       const { userId, boardSlug, isManager } =
         await this.getClientCredits(client);
 
-      this.socketService.addClient(userId, boardSlug, client);
+      const addStatus = this.socketService.addClient(userId, boardSlug, client);
       this.socketService.joinRoom(client, boardSlug);
 
       if (isManager) {
         this.socketService.joinRoom(client, boardSlug, true);
-        this.socketService.send(
-          {
-            from: userId,
-            event: 'join',
-            content: {},
-          },
-          boardSlug,
-        );
+        if (addStatus) {
+          this.socketService.send(
+            {
+              from: userId,
+              event: 'join',
+              content: {},
+            },
+            boardSlug,
+          );
+        }
       }
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.log('ws: connect error', e);
       client.disconnect();
     }
@@ -70,6 +75,7 @@ export class AppGateway
         );
       }
     } catch {
+      // eslint-disable-next-line no-console
       console.log('ws: disconnect error');
     }
   }
@@ -84,13 +90,16 @@ export class AppGateway
       const { users, managers } = await this.boardsService.getForAccessChecks(
         boardSlug as string,
       );
-      if (!users.find((u) => u.id === user.id)) {return null;}
+      if (!users.find((u) => u.id === user.id)) {
+        return null;
+      }
       return {
         userId: user.id,
         boardSlug: boardSlug as string,
         isManager: !!managers.find((m) => m.id === user.id),
       };
     } catch {
+      // eslint-disable-next-line no-console
       console.log('ws: credits error');
     }
   }

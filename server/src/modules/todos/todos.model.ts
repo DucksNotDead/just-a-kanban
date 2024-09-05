@@ -10,7 +10,7 @@ export class Todo {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ApiField('TODO_LABEL')
+  @ApiField('TODOS')
   @Column(DATA_STRING)
   label: string;
 

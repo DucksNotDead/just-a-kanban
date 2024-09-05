@@ -3,7 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { CSSTransition, SwitchTransition } from 'react-transition-group';
 import { PAGE_TRANSITION_DURATION, appRoutes } from 'shared/const';
 
-import { BoardKanbanPage } from '../../pages/BoardKanbanPage';
+import { BoardPage } from '../../pages/BoardPage';
 import { ErrorPage } from '../../pages/ErrorPage';
 import { HomePage } from '../../pages/HomePage';
 import { LoginPage } from '../../pages/LoginPage';
@@ -12,7 +12,7 @@ const routes = [
   { path: '/', element: <Navigate to={appRoutes.home} replace /> },
   { path: appRoutes.login, element: <LoginPage /> },
   { path: appRoutes.home, element: <HomePage /> },
-  { path: appRoutes.board(':boardSlug'), element: <BoardKanbanPage /> },
+  { path: appRoutes.board(':boardSlug'), element: <BoardPage /> },
   { path: '*', element: <ErrorPage /> },
 ];
 

@@ -10,9 +10,8 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 
 import { TaskCreateDto } from './dto/task-create-dto';
-import { TaskMetaChangeDto } from './dto/task-meta-change-dto';
-import { ReqTaskId } from './task.decorator';
-import { TASK_ID_KEY } from './tasks.const';
+import { ReqTaskAccess, ReqTaskId } from './task.decorator';
+import { ITaskAccess, TASK_ID_KEY } from './tasks.const';
 import { TasksService } from './tasks.service';
 import { BoardAccess } from '../../access/board';
 import { TaskAccess } from '../../access/task';
@@ -35,6 +34,15 @@ export class TasksController {
   @Get(`:${BOARD_SLUG_KEY}`)
   getAll(@ReqBoard() board: Board, @ReqUser() user: User) {
     return this.service.getByUserBoard(board, user);
+  }
+
+  @ApiMethod('Get task access', {
+    params: [TASK_ID_KEY],
+  })
+  @TaskAccess()
+  @Get(`:${TASK_ID_KEY}`)
+  getAccess(@ReqTaskAccess() access: ITaskAccess) {
+    return access;
   }
 
   @ApiMethod('Create task (board manager access)', {
@@ -107,13 +115,13 @@ export class TasksController {
 
   @ApiMethod('Change task meta (board manager access)', {
     params: [TASK_ID_KEY],
-    body: TaskMetaChangeDto,
+    body: TaskCreateDto,
   })
   @BoardAccess(true)
   @Patch(`:${TASK_ID_KEY}/meta`)
   changeMeta(
     @ReqTaskId() id: number,
-    @Body() dto: TaskMetaChangeDto,
+    @Body() dto: Partial<TaskCreateDto>,
     @ReqBoard() board: Board,
     @ReqUser() user: User,
   ) {

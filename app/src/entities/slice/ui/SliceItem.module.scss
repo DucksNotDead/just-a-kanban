@@ -1,0 +1,18 @@
+.SliceItem {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  gap: var(--sm);
+}
+
+.SliceColor {
+  width: 20px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+
+.SliceName {
+  flex: 1;
+  overflow-x: hidden;
+}

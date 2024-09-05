@@ -1,0 +1,1 @@
+export type TEditMode = 'meta'|'todos'|null

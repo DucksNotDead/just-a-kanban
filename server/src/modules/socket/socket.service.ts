@@ -22,41 +22,49 @@ export class SocketService {
   }
 
   addClient(id: number, bordSlug: string, client: Socket) {
-    this.clients = { ...this.clients, [this.toClientId(bordSlug, id)]: client };
+    const key = this.toClientId(bordSlug, id);
+    if (!this.clients[key]) {
+      this.clients = { ...this.clients, [key]: client };
+      return true;
+    } else {
+      return false;
+    }
   }
 
   removeClient(id: number, boardSlug: string) {
     try {
       delete this.clients[this.toClientId(boardSlug, id)];
     } catch {
+      // eslint-disable-next-line no-console
       console.log('ws: client not found');
     }
   }
 
   send(message: ISocketMessage, boardSlug: string, taskResponsibleId?: number) {
-    this.emit({ boardSlug, onlyManagers: !!taskResponsibleId }, message);
     if (taskResponsibleId) {
       const client = this.clients
         ? this.clients[this.toClientId(boardSlug, taskResponsibleId)]
         : null;
 
-      if (!client)
-        {throw Exception.NotFound(
+      if (!client) {
+        throw Exception.NotFound(
           `ws: client (board: ${boardSlug}, id: ${taskResponsibleId})`,
-        );}
+        );
+      }
 
       this.emit(client, message);
     }
+    this.emit({ boardSlug, onlyManagers: !!taskResponsibleId }, message);
   }
 
   private emit(
     to: Socket | { boardSlug: string; onlyManagers: boolean },
-    message: ISocketMessage,
+    { event, ...message }: ISocketMessage,
   ) {
     (to instanceof Socket
       ? to
       : this.server.to(this.roomName(to.boardSlug, to.onlyManagers))
-    ).emit('onMessage', message);
+    ).emit(event, message);
   }
 
   private toClientId(boardSlug: string, id: number) {

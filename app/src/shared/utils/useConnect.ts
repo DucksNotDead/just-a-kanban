@@ -1,13 +1,13 @@
 import { API_BASE_URL, TOKEN_KEY } from 'shared/const';
 
 export function useConnect() {
-  return function connect<T>(
+  return function connect<T = void>(
     path: string,
     method: 'get' | 'post' | 'put' | 'patch' | 'delete' = 'get',
     body?: Record<string, any>,
-  ): Promise<T|null> {
+  ): Promise<T | null> {
     const token = localStorage.getItem(TOKEN_KEY);
-    return new Promise<T|null>((resolve) => {
+    return new Promise<T | null>((resolve) => {
       fetch(API_BASE_URL + path, {
         headers: {
           'Content-Type': 'application/json',

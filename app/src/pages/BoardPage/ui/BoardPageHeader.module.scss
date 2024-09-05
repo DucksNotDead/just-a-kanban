@@ -1,0 +1,19 @@
+.BoardKanbanPageHeader {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: var(--lg) var(--xl);
+  & div:nth-child(2) {
+    justify-content: center;
+  }
+  & div:nth-child(3) {
+    justify-content: flex-end;
+  }
+}
+
+.Item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--lg);
+}

@@ -1,6 +1,5 @@
+import { Avatar } from 'antd';
 import { IUser, UserAvatar } from 'entities/user';
-
-import Styles from './UserAvatarsPanel.module.scss';
 
 interface IProps {
   users: IUser[];
@@ -8,10 +7,10 @@ interface IProps {
 
 export function UserAvatarsPanel({ users }: IProps) {
   return (
-    <div className={Styles.UserAvatarsPanel}>
-      {users.slice(0, 6).map((user) => (
-        <UserAvatar key={user.id} avatar={user.avatar}/>
-      ))}
-    </div>
+   <Avatar.Group max={{ count: 3 }}>
+     {users.map((user) => (
+       <UserAvatar key={user.id} avatar={user.avatar}/>
+     ))}
+   </Avatar.Group>
   );
 }

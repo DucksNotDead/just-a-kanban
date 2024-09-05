@@ -9,13 +9,13 @@ import { AuthGuard } from './modules/auth/auth.guard';
 import { AuthModule } from './modules/auth/auth.module';
 import { BoardsModule } from './modules/boards/boards.module';
 import { CommentsModule } from './modules/comments/comments.module';
+import { MediaModule } from './modules/media/media.module';
+import { SlicesModule } from './modules/slices/slices.module';
 import { SocketModule } from './modules/socket/socket.module';
-import { SprintsModule } from './modules/sprints/sprints.module';
 import { StepsModule } from './modules/steps/steps.module';
 import { TasksModule } from './modules/tasks/tasks.module';
 import { TodosModule } from './modules/todos/todos.module';
 import { UsersModule } from './modules/users/users.module';
-import { MediaModule } from './modules/media/media.module';
 
 @Module({
   imports: [
@@ -31,7 +31,7 @@ import { MediaModule } from './modules/media/media.module';
     UsersModule,
     TasksModule,
     BoardsModule,
-    SprintsModule,
+    SlicesModule,
     StepsModule,
     CommentsModule,
     AuthModule,

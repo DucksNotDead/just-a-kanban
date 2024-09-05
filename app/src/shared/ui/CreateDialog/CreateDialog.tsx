@@ -41,6 +41,7 @@ export const CreateDialog = forwardRef<IModalRef, IProps>(
     useImperativeHandle(ref, () => ({
       open: () => setOpen(() => true),
       close: () => setOpen(() => false),
+      isOpen: open,
     }));
 
     return (

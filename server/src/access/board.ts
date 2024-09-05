@@ -10,7 +10,7 @@ import { Exception } from '../config/exception';
 import { BOARD_KEY, BOARD_SLUG_KEY } from '../modules/boards/boards.const';
 import { Board } from '../modules/boards/boards.model';
 import { BoardsService } from '../modules/boards/boards.service';
-import { SPRINT_ID_KEY } from '../modules/sprints/sprints.const';
+import { SLICE_ID_KEY } from '../modules/slices/slices.const';
 import { TASK_ID_KEY } from '../modules/tasks/tasks.const';
 import { User } from '../modules/users/users.model';
 
@@ -28,13 +28,13 @@ export async function boardAccessFn(
       user,
       params: {
         [BOARD_SLUG_KEY]: boardSlug,
-        [SPRINT_ID_KEY]: sprintId,
+        [SLICE_ID_KEY]: sprintId,
         [TASK_ID_KEY]: taskId,
       },
     } = request;
 
     const board: Board = boardSlug
-      ? await service.getBySlug(boardSlug as string)
+      ? await service.getBySlugForAccess(boardSlug as string)
       : sprintId
         ? await service.getBySprint(Number(sprintId))
         : taskId
@@ -47,7 +47,9 @@ export async function boardAccessFn(
       managerAccess,
     );
 
-    if (!isBoardUser) {throw Exception.AccessDenied();}
+    if (!isBoardUser) {
+      throw Exception.AccessDenied();
+    }
 
     request[BOARD_KEY] = board;
     return board;
@@ -67,5 +69,5 @@ export const BoardAccess = (managerAccess?: boolean) => {
     }
   }
 
-  return UseGuards(BoardAccessGuard)
+  return UseGuards(BoardAccessGuard);
 };

@@ -1,0 +1,55 @@
+.TaskMeta {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 12px;
+  overflow: hidden;
+
+  &Left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--sm);
+  }
+
+  &Right {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sm);
+  }
+
+  &Tags {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    gap: var(--lg);
+    & {
+      width: fit-content;
+    }
+  }
+
+  &Date {
+    border-radius: 999px;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    gap: var(--sm);
+    padding: var(--xs) var(--md);
+
+    svg {
+      width: 14px;
+    }
+  }
+
+  &EditMask {
+    cursor: pointer;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(80,80,90, .5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}

@@ -5,8 +5,8 @@ import { TasksController } from './tasks.controller';
 import { Task } from './tasks.model';
 import { TasksService } from './tasks.service';
 import { BoardsModule } from '../boards/boards.module';
+import { SlicesModule } from '../slices/slices.module';
 import { SocketModule } from "../socket/socket.module";
-import { SprintsModule } from '../sprints/sprints.module';
 import { StepsModule } from '../steps/steps.module';
 import { TodosModule } from "../todos/todos.module";
 import { UsersModule } from '../users/users.module';
@@ -15,7 +15,7 @@ import { UsersModule } from '../users/users.module';
   imports: [
     TypeOrmModule.forFeature([Task]),
     UsersModule,
-    SprintsModule,
+    SlicesModule,
     StepsModule,
     BoardsModule,
     forwardRef(() => TodosModule),

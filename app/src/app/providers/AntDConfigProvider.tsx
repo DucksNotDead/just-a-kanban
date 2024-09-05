@@ -11,9 +11,7 @@ interface IProps {
 export function AntDConfigProvider({ children }: IProps) {
   return (
     <ConfigProvider locale={ruRU} theme={antDThemeConfig}>
-      <App>
-        {children}
-      </App>
+      <App notification={{ placement: 'bottomRight' }}>{children}</App>
     </ConfigProvider>
   );
 }

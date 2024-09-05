@@ -1,0 +1,23 @@
+.TaskDetail {
+
+  &Content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &TodosHeader {
+    display: flex;
+    align-items: center;
+    gap: var(--md);
+    svg {
+      width: 16px;
+    }
+  }
+
+  :global {
+    .ant-modal-footer {
+      display: flex;
+      justify-content: space-between;
+    }
+  }
+}
