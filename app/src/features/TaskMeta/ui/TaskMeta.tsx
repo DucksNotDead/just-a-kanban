@@ -11,6 +11,7 @@ interface IProps {
   onChange: (meta: ITaskMeta) => void;
   onEditClick: () => void;
   onReadyChange: (isReady: boolean) => void;
+  hasEditAccess: boolean;
 }
 
 const { editConditionMotionProps } = taskMetaTransitionConfig;
@@ -21,6 +22,7 @@ export function TaskMeta({
   onChange,
   onEditClick,
   onReadyChange,
+  hasEditAccess,
 }: IProps) {
   return (
     <LayoutGroup>
@@ -35,7 +37,13 @@ export function TaskMeta({
           </motion.div>
         ) : (
           <motion.div {...editConditionMotionProps} key={'meta-view'}>
-            {task && <TaskMetaView taskMeta={task} onEditClick={onEditClick} />}
+            {task && (
+              <TaskMetaView
+                taskMeta={task}
+                onEditClick={onEditClick}
+                hasEditAccess={hasEditAccess}
+              />
+            )}
           </motion.div>
         )}
       </AnimatePresence>

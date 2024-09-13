@@ -1,18 +1,10 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  Inject,
-  UseGuards,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, Inject, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
 
 import { boardAccessFn } from './board';
 import { Exception } from '../config/exception';
 import { BoardsService } from '../modules/boards/boards.service';
-import {
-  TASK_ID_KEY,
-  TASK_USER_ACCESS_KEY,
-} from '../modules/tasks/tasks.const';
+import { TASK_ID_KEY } from '../modules/tasks/tasks.const';
 import { TasksService } from '../modules/tasks/tasks.service';
 import { USER_KEY } from '../modules/users/users.const';
 import { User } from '../modules/users/users.model';
@@ -49,9 +41,9 @@ export const TaskAccess = (
           true,
         );
 
-        const isResponsible = responsible.id === user.id;
+        const isResponsible = responsible?.id === user.id;
 
-        const isReviewer = reviewer.id === user.id;
+        const isReviewer = reviewer?.id === user.id;
 
         const access =
           reviewer && lockOnReview
@@ -61,8 +53,6 @@ export const TaskAccess = (
         if (!access) {
           throw Exception.AccessDenied();
         }
-
-        request[TASK_USER_ACCESS_KEY] = { isResponsible, isReviewer };
 
         return true;
       } catch {

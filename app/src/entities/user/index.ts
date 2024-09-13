@@ -8,6 +8,8 @@ export { useCurrentUser } from './model/useCurrentUser';
 
 export { useBoardUsers } from './model/useBoardUsers';
 
+export { useAuthApi } from './api/authApi'
+
 export { useUsersApi } from './api/usersApi';
 
 export { UserAvatar } from './ui/UserAvatar';

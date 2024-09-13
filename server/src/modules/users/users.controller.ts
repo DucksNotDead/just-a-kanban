@@ -23,8 +23,8 @@ export class UsersController {
     return this.service.getAll(user.id);
   }
 
-  @ApiMethod('Get users in chosen board (board manager access)', { params: [BOARD_SLUG_KEY] })
-  @BoardAccess(true)
+  @ApiMethod('Get users in chosen board (board access)', { params: [BOARD_SLUG_KEY] })
+  @BoardAccess()
   @Get(`:${BOARD_SLUG_KEY}`)
   getByBoard(@ReqBoardSlug() slug: string) {
     return this.service.getByBoard(slug);

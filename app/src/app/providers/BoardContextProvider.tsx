@@ -4,6 +4,7 @@ import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router';
 import { useNavigate } from 'react-router-dom';
 import { CHOSEN_BOARD_KEY, appRoutes } from 'shared/const';
+import { usePending } from 'shared/utils';
 
 interface IProps {
   children: ReactNode;
@@ -14,7 +15,7 @@ export function BoardContextProvider({ children }: IProps) {
   const { user } = useCurrentUser();
   const { pathname } = useLocation();
   const navigate = useNavigate();
-  const [pending, setPending] = useState(true);
+  const [boardPending, setBoardPending] = usePending();
   const [board, setBoard] = useState<IBoard | null>(null);
   const [hasManagerAccess, setHasManagerAccess] = useState(false);
 
@@ -40,13 +41,13 @@ export function BoardContextProvider({ children }: IProps) {
             localStorage.removeItem(CHOSEN_BOARD_KEY);
           }
         })
-        .finally(() => setPending(() => false));
+        .finally(() => setBoardPending(() => false));
     }
 
     return () => {
       setBoard(() => null)
       setHasManagerAccess(() => false)
-      setPending(() => true)
+      setBoardPending(() => true)
     }
   }, [boardSlug, user]);
 
@@ -59,7 +60,7 @@ export function BoardContextProvider({ children }: IProps) {
   }, [boardSlug, localStorage.getItem(CHOSEN_BOARD_KEY)]);
 
   return (
-    <boardContext.Provider value={{ board, pending, hasManagerAccess }}>
+    <boardContext.Provider value={{ board, boardPending, hasManagerAccess }}>
       {children}
     </boardContext.Provider>
   );

@@ -1,5 +1,6 @@
 export interface ITodo {
   id?: number;
+  order?: number;
   label: string;
   checked: boolean;
 }

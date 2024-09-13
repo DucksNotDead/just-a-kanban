@@ -35,7 +35,7 @@ export function useBoardsApi() {
       await connect<IBoardWithUsers>(urls.items(), 'post', dto),
 
     changeName: async (boardSlug: string, name: string) =>
-      await connect<IBoard>(urls.name(boardSlug, name), 'patch'),
+      await connect<{ slug: string }>(urls.name(boardSlug, name), 'patch'),
 
     changeUsers: async (boardSlug: string, dto: IBoardChangeUsersRequest) =>
       await connect<IBoard>(urls.users(boardSlug), 'patch', dto),

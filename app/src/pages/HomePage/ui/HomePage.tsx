@@ -1,37 +1,63 @@
 import { App, Button } from 'antd';
 import { IBoardWithUsers, useBoardsApi } from 'entities/board';
 import { useCurrentUser } from 'entities/user';
-import { DiamondPlus, LogOut, RotateCcw, Users } from 'lucide-react';
+import { DiamondPlus, LogOut, Users } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { appMessages, appRoutes } from 'shared/const';
 import { IModalRef } from 'shared/types';
 import { UsersList } from 'widgets/UsersList';
 
-import { BoardCreateDialog } from './BoardCreateDialog';
 import { BoardEnterCard } from './BoardEnterCard';
+import { BoardUpdateDialog } from './BoardUpdateDialog';
 
 import Styles from './HomePage.module.scss';
 
 export function HomePage() {
-  const { user, logout } = useCurrentUser();
   const boardsApi = useBoardsApi();
   const navigate = useNavigate();
+  const { user, logout } = useCurrentUser();
   const { modal } = App.useApp();
   const [boards, setBoards] = useState<IBoardWithUsers[]>([]);
-  const [key, setKey] = useState(Math.random);
-  const boardCreateModalRef = useRef<IModalRef>(null);
+  const [boardToUpdate, setBoardToUpdate] = useState<IBoardWithUsers | null>(
+    null,
+  );
+
+  const boardUpdateModalRef = useRef<IModalRef>(null);
   const usersListRef = useRef<IModalRef>(null);
+
+  const getBoard = useCallback(
+    (boardSlug: string) => {
+      return boards.find((b) => b.slug === boardSlug);
+    },
+    [boards],
+  );
 
   const handleBoardClick = useCallback((boardSlug: string) => {
     navigate(appRoutes.board(boardSlug));
   }, []);
 
-  const handleBoardDelete = useCallback(
+  const handleBoardChangeClick = useCallback(
     (boardSlug: string) => {
-      modal.confirm({
-        title: `Удалить доску ${boards.find((b) => b.slug === boardSlug)?.name}?`,
+      const board = getBoard(boardSlug);
+      if (board) {
+        setBoardToUpdate(() => ({
+          ...board,
+          users: board.users.filter((u) => u.id !== user?.id),
+          managers: board.managers.filter((mId) => mId !== user?.id),
+        }));
+      }
+    },
+    [getBoard, user],
+  );
+
+  const handleBoardDeleteClick = useCallback(
+    (boardSlug: string) => {
+      modal.warning({
+        title: `Удалить доску ${getBoard?.name}?`,
         content: appMessages.confirm.delete,
+        okText: 'Удалить',
+        okButtonProps: { danger: true },
         onOk: () =>
           boardsApi.delete(boardSlug).then(() => {
             setBoards((prevState) =>
@@ -40,20 +66,37 @@ export function HomePage() {
           }),
       });
     },
-    [boards],
+    [getBoard],
   );
 
   const handleCreateBoardClick = useCallback(() => {
-    boardCreateModalRef.current?.open();
-  }, []);
-
-  const handleUpdateClick = useCallback(() => {
-    setKey(() => Math.random());
+    boardUpdateModalRef.current?.open();
   }, []);
 
   const handleBoardCreated = useCallback((board: IBoardWithUsers) => {
     setBoards((prevState) => [...prevState, board]);
   }, []);
+
+  const handleBoardUpdated = useCallback(
+    (board: IBoardWithUsers) => {
+      if (!user) {
+        return;
+      }
+      setBoards((prevState) => {
+        const index = prevState.findIndex((b) => b.id === board.id);
+        return [
+          ...prevState.slice(0, index),
+          {
+            ...board,
+            users: [...board.users, user],
+            managers: [...board.managers, user.id],
+          },
+          ...prevState.slice(index + 1),
+        ];
+      });
+    },
+    [user],
+  );
 
   const handleUserDelete = useCallback((userId: number) => {
     setBoards((prevState) => {
@@ -72,17 +115,25 @@ export function HomePage() {
     modal.confirm({
       title: 'Вы уверены, что хотите выйти?',
       onOk: logout,
-      okText: 'Выйти'
-    })
+      okText: 'Выйти',
+    });
   }, []);
 
   useEffect(() => {
-    boardsApi.getAll().then((data) => {
-      if (data) {
-        setBoards(() => data);
-      }
-    });
-  }, [key]);
+    boardsApi
+      .getAll()
+      .then((data) => {
+        if (data) {
+          setBoards(() => data);
+        }
+      })
+  }, []);
+
+  useEffect(() => {
+    if (boardToUpdate) {
+      boardUpdateModalRef.current?.open();
+    }
+  }, [boardToUpdate]);
 
   return (
     <div className={Styles.HomePage}>
@@ -103,9 +154,6 @@ export function HomePage() {
             <DiamondPlus />
           </Button>
         )}
-        <Button type={'text'} onClick={handleUpdateClick}>
-          <RotateCcw />
-        </Button>
       </div>
       <div className={Styles.BoardsList}>
         {boards.length ? (
@@ -114,7 +162,8 @@ export function HomePage() {
               key={board.id}
               board={board}
               onClick={handleBoardClick}
-              onDelete={handleBoardDelete}
+              onDelete={handleBoardDeleteClick}
+              onChange={handleBoardChangeClick}
               isAdmin={user?.isAdmin}
             />
           ))
@@ -127,9 +176,12 @@ export function HomePage() {
       </div>
       {!user?.isAdmin ? null : (
         <>
-          <BoardCreateDialog
-            ref={boardCreateModalRef}
+          <BoardUpdateDialog
+            ref={boardUpdateModalRef}
+            data={boardToUpdate}
             onCreated={handleBoardCreated}
+            onUpdated={handleBoardUpdated}
+            onClose={() => setBoardToUpdate(() => null)}
           />
           <UsersList ref={usersListRef} onDelete={handleUserDelete} />
         </>

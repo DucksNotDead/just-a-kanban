@@ -1,7 +1,8 @@
 import { useSlices } from 'entities/slice';
 import { ReactNode } from 'react';
+import { toFixedName } from 'shared/utils';
 
-import { toFixedSliceName } from '../lib/toFixedSliceName';
+import { sliceNameLen } from '../model/const/sliceConst';
 
 import Styles from './SliceItem.module.scss';
 
@@ -21,7 +22,9 @@ export function SliceItem({ id, postfix }: IProps) {
           className={Styles.SliceColor}
           style={{ backgroundColor: slice.color }}
         />
-        <div className={Styles.SliceName}>{toFixedSliceName(slice.name)}</div>
+        <div className={Styles.SliceName}>
+          {toFixedName(slice.name, sliceNameLen)}
+        </div>
         {postfix}
       </div>
     );

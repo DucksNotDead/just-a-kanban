@@ -1,18 +1,17 @@
-import { IUser, IUserCredits, userContext } from 'entities/user';
-import { useAuthApi } from 'entities/user/api/authApi';
+import { IUser, IUserCredits, useAuthApi, userContext } from 'entities/user';
 import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TOKEN_KEY, appRoutes } from 'shared/const';
+import { usePending } from 'shared/utils';
 
 interface IProps {
   children: ReactNode;
 }
 
-export function UserContextProvider({ children }: IProps) {
+export function AuthContextProvider({ children }: IProps) {
+  const [pending, setPending] = usePending(false);
   const [user, setUser] = useState<IUser | null>(null);
   const navigate = useNavigate();
-
-  const [pending, setPending] = useState(false);
   const api = useAuthApi();
 
   function timeout() {

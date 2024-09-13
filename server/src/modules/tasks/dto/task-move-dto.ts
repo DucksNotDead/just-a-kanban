@@ -1,7 +1,7 @@
 import { ApiField } from '../../../config/swagger';
 
 export class TaskMoveDto {
-  @ApiField('TASK_ORDER')
+  @ApiField('ORDER')
   order: number;
 
   @ApiField('ID')

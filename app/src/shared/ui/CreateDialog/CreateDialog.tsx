@@ -12,6 +12,7 @@ interface IProps {
   onConfirm: () => void;
   onClose?: () => void;
   children: ReactNode;
+  action?: string;
   entity: string;
   loading?: boolean;
   disabled?: boolean;
@@ -28,6 +29,7 @@ export const CreateDialog = forwardRef<IModalRef, IProps>(
       disabled,
       classname,
       onClose,
+      action,
     },
     ref,
   ) => {
@@ -48,11 +50,11 @@ export const CreateDialog = forwardRef<IModalRef, IProps>(
       <Modal
         open={open}
         onCancel={handleClose}
-        title={'Создать ' + entity}
+        title={(action ?? 'Создать') + ' ' + entity}
         onOk={onConfirm}
         destroyOnClose={true}
         okButtonProps={{ disabled, loading }}
-        okText={'Создать'}
+        okText={(action ? 'Сохранить' : 'Создать')}
         className={classname}
       >
         {children}

@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 
 import { ISocketMessage } from './socket.const';
-import { Exception } from '../../config/exception';
 
 @Injectable()
 export class SocketService {
@@ -46,13 +45,9 @@ export class SocketService {
         ? this.clients[this.toClientId(boardSlug, taskResponsibleId)]
         : null;
 
-      if (!client) {
-        throw Exception.NotFound(
-          `ws: client (board: ${boardSlug}, id: ${taskResponsibleId})`,
-        );
+      if (client && !client.rooms.has(this.roomName(boardSlug, true))) {
+        this.emit(client, message);
       }
-
-      this.emit(client, message);
     }
     this.emit({ boardSlug, onlyManagers: !!taskResponsibleId }, message);
   }

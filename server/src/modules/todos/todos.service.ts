@@ -41,17 +41,18 @@ export class TodosService {
     });
 
     const oldTodos: Todo[] = [];
-    for (const todo of todos) {
-      if (!(todo instanceof Todo)) {
-        const newTodo = this.todos.create({
+    for (const todoIndex in todos) {
+      let todo = todos[todoIndex];
+      if (!(todo as Todo).id) {
+        todo = this.todos.create({
           label: todo.label,
           checked: false,
           task,
         });
-        await this.todos.save(newTodo);
       } else {
-        oldTodos.push(todo);
+        oldTodos.push(todo as Todo);
       }
+      await this.todos.save({ ...todo, order: Number(todoIndex) + 1 });
     }
 
     for (const currentTodo of currentTodos) {
@@ -64,7 +65,12 @@ export class TodosService {
       {
         from: userId,
         event: 'taskTodosChange',
-        content: { taskId, todos },
+        content: {
+          taskId,
+          todos: await this.todos.findBy({
+            task: { id: taskId },
+          }),
+        },
       },
       boardSlug,
       task.responsible.id,
@@ -80,8 +86,8 @@ export class TodosService {
     this.socketService.send(
       {
         from: userId,
-        event: 'todoToggle',
-        content: { taskId: task.id, id },
+        event: 'taskTodoToggle',
+        content: { taskId: task.id, todoId: id, checked: todo.checked },
       },
       boardSlug,
       task.responsible.id,

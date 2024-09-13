@@ -1,17 +1,9 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { TaskCreateDto } from './dto/task-create-dto';
-import { ReqTaskAccess, ReqTaskId } from './task.decorator';
-import { ITaskAccess, TASK_ID_KEY } from './tasks.const';
+import { ReqTaskId } from './task.decorator';
+import { TASK_ID_KEY } from './tasks.const';
 import { TasksService } from './tasks.service';
 import { BoardAccess } from '../../access/board';
 import { TaskAccess } from '../../access/task';
@@ -31,25 +23,16 @@ export class TasksController {
     params: [BOARD_SLUG_KEY],
   })
   @BoardAccess()
-  @Get(`:${BOARD_SLUG_KEY}`)
+  @Get(`/board/:${BOARD_SLUG_KEY}`)
   getAll(@ReqBoard() board: Board, @ReqUser() user: User) {
     return this.service.getByUserBoard(board, user);
-  }
-
-  @ApiMethod('Get task access', {
-    params: [TASK_ID_KEY],
-  })
-  @TaskAccess()
-  @Get(`:${TASK_ID_KEY}`)
-  getAccess(@ReqTaskAccess() access: ITaskAccess) {
-    return access;
   }
 
   @ApiMethod('Create task (board manager access)', {
     params: [BOARD_SLUG_KEY],
   })
   @BoardAccess(true)
-  @Post(`:${BOARD_SLUG_KEY}`)
+  @Post(`/board/:${BOARD_SLUG_KEY}`)
   create(
     @ReqBoard() board: Board,
     @ReqUser() user: User,
@@ -113,6 +96,19 @@ export class TasksController {
     return this.service.setReviewer(user, id, board.slug);
   }
 
+  @ApiMethod('Set task replacer (task access)', {
+    params: [TASK_ID_KEY],
+  })
+  @TaskAccess()
+  @Patch(`:${TASK_ID_KEY}/replacer`)
+  setReplacer(
+    @ReqUser() user: User,
+    @ReqTaskId() id: number,
+    @ReqBoard() board: Board,
+  ) {
+    return this.service.setReplacer(user, id, board.slug);
+  }
+
   @ApiMethod('Change task meta (board manager access)', {
     params: [TASK_ID_KEY],
     body: TaskCreateDto,
@@ -138,6 +134,6 @@ export class TasksController {
     @ReqBoard() board: Board,
     @ReqUser() user: User,
   ) {
-    return this.service.delete(id, board.slug, user.id);
+    return this.service.delete(id, board, user.id);
   }
 }

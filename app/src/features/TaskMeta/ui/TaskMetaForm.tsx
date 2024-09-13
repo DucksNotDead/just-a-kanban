@@ -52,7 +52,7 @@ export function TaskMetaForm({ data, onChange, onReadyChange }: IProps) {
         const value = data[field as keyof typeof data];
         form.setFieldValue(
           field as keyof typeof data,
-          ['starts', 'deadline'].includes(field)
+          ['starts', 'deadline'].includes(field) && typeof value === 'string'
             ? stringToDate(value as string)
             : value,
         );
@@ -73,7 +73,7 @@ export function TaskMetaForm({ data, onChange, onReadyChange }: IProps) {
   }, [isReady, onChange, value]);
 
   useEffect(() => {
-    onReadyChange(isReady)
+    onReadyChange(isReady);
   }, [isReady]);
 
   return (
@@ -95,7 +95,7 @@ export function TaskMetaForm({ data, onChange, onReadyChange }: IProps) {
             >
               {field.date ? (
                 <DateTimePicker
-                  value={value?.[field.name] as Dayjs|undefined}
+                  value={value?.[field.name] as Dayjs | undefined}
                   onChange={(dayjs) => handleDateChange(dayjs, field.name)}
                   min={
                     field.name === 'deadline' && value
@@ -104,9 +104,15 @@ export function TaskMetaForm({ data, onChange, onReadyChange }: IProps) {
                   }
                 />
               ) : field.name === 'responsible' ? (
-                <UserSelect value={value && [value[field.name]]} onChange={handleResponsibleChange} />
+                <UserSelect
+                  value={value && [value[field.name]]}
+                  onChange={handleResponsibleChange}
+                />
               ) : field.name === 'slice' ? (
-                <SliceSelect value={value?.[field.name]} onChange={handleSliceChange} />
+                <SliceSelect
+                  value={value?.[field.name]}
+                  onChange={handleSliceChange}
+                />
               ) : (
                 <Input placeholder={'Название'} />
               )}

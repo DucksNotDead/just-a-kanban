@@ -14,6 +14,10 @@ body,
   height: 100%;
 }
 
+.ant-badge {
+  width: 100%;
+}
+
 .ant-list-item-meta-title {
   margin: 0 !important;
 }
@@ -52,9 +56,14 @@ body,
   display: none !important;
 }
 
+.ant-btn-dangerous {
+  box-shadow: none!important;
+}
+
 * {
   box-sizing: border-box;
   font-family: 'Inter', serif;
+  outline: none;
 }
 
 p,
@@ -88,7 +97,7 @@ h2 {
 }
 
 h3 {
-  font-size: clamp(0.875rem, 0.8393rem + 0.1786vw, 1.125rem);
+  font-size: clamp(0.675rem, 0.7393rem + 0.1286vw, 1.125rem);
   letter-spacing: 0.1rem;
   font-weight: 500;
 }

@@ -1,13 +1,4 @@
-import { CheckboxChangeEvent } from 'antd/es/checkbox';
-import {
-  FocusEvent,
-  FormEvent,
-  KeyboardEvent,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { FocusEvent, FormEvent, KeyboardEvent, useCallback, useEffect, useRef, useState } from 'react';
 
 import { ITodoListItem } from './types/todoListTypes';
 
@@ -65,10 +56,16 @@ export function useTodoListEdit(
       field: 'label' | 'checked',
       newValue: string | boolean,
     ) => {
-      const index = items.findIndex((item) => item.key === itemKey);
-      if (index !== -1) {
-        items[index][field] = newValue as never;
-        setItems([...items]);
+      const fn = (item: ITodoListItem) => item.key === itemKey;
+      const item = items.find(fn);
+      if (item) {
+        const index = items.findIndex(fn);
+        (item[field] as ITodoListItem[typeof field]) = newValue;
+        setItems([
+          ...items.slice(0, index),
+          item,
+          ...items.slice(index + 1),
+        ]);
       }
     },
     [items, setItems],
@@ -155,13 +152,6 @@ export function useTodoListEdit(
     [set],
   );
 
-  const handleToggle = useCallback(
-    (e: CheckboxChangeEvent, itemKey: string) => {
-      set(itemKey, 'checked', e.target.checked);
-    },
-    [set],
-  );
-
   const handleBlur = useCallback(
     ({ target }: FocusEvent<HTMLTextAreaElement>, itemKey: string) => {
       const item = items.find((t) => t.key === itemKey);
@@ -210,7 +200,6 @@ export function useTodoListEdit(
   return {
     handleInputKeyPress,
     handleInput,
-    handleToggle,
     handleBlur,
     listRef,
   };

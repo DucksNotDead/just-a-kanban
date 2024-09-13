@@ -3,6 +3,6 @@ import { createContext } from 'react';
 
 export const boardContext = createContext<IBoardContext>({
   board: null,
-  pending: false,
+  boardPending: false,
   hasManagerAccess: false,
 });

@@ -10,6 +10,7 @@ import {
 } from 'react';
 import { appMessages } from 'shared/const';
 import { IModalRef } from 'shared/types';
+import { usePending } from 'shared/utils';
 
 import { UserCreateDialog } from './UserCreateDialog';
 
@@ -23,7 +24,7 @@ export const UsersList = forwardRef<IModalRef, IProps>(({ onDelete }, ref) => {
   const usersApi = useUsersApi();
   const [isOpen, setIsOpen] = useState(false);
   const [users, setUsers] = useState<IUser[]>([]);
-  const [pending, setPending] = useState(false);
+  const [pending, setPending] = usePending()
   const createDialogRef = useRef<IModalRef>(null);
   const { message, modal } = App.useApp();
 

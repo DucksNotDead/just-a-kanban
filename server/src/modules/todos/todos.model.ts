@@ -14,6 +14,10 @@ export class Todo {
   @Column(DATA_STRING)
   label: string;
 
+  @ApiField('ORDER')
+  @Column({ nullable: true })
+  order: number;
+
   @ApiField('BOOLEAN')
   @Column({ default: false })
   checked: boolean;

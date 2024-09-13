@@ -1,5 +1,5 @@
 import { useBoard } from 'entities/board';
-import { socketContext } from 'entities/socket';
+import {socketContext} from 'features/Socket'
 import { ReactNode, useEffect, useState } from 'react';
 import { API_BASE_URL, TOKEN_KEY } from 'shared/const';
 import { Socket, io } from 'socket.io-client';
@@ -16,7 +16,7 @@ export function SocketContextProvider({ children }: IProps) {
     const instance = io(API_BASE_URL, {
       autoConnect: false,
       extraHeaders: {
-        Authorization: 'Bearer ' + window.localStorage.getItem(TOKEN_KEY),
+        authorization: 'Bearer ' + window.localStorage.getItem(TOKEN_KEY),
       },
       query: { boardSlug: board?.slug },
     });

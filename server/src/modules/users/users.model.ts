@@ -57,6 +57,12 @@ export class User {
   })
   reviewTask: Task;
 
+  @OneToOne(() => Task, (task) => task.replacer, {
+    onDelete: 'SET NULL',
+    nullable: true,
+  })
+  replacingTask: Task;
+
   @ManyToMany(() => Board, (board) => board.users)
   boards: Board[];
 }

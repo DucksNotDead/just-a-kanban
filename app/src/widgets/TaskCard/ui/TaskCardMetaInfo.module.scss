@@ -1,0 +1,14 @@
+.TaskCardMetaInfo {
+  position: absolute;
+  top: -8px;
+  left: -6px;
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  border-radius: 999px;
+
+  &Slice {
+    text-transform: uppercase;
+    font-size: 11px;
+  }
+}

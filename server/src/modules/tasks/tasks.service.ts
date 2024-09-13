@@ -24,13 +24,33 @@ export class TasksService {
     private readonly socketService: SocketService,
   ) {}
 
-  async getByUserBoard(board: Board, user: User): Promise<Task[]> {
-    return await this.tasks.find({
+  async getByUserBoard(board: Board, user: User) {
+    /*return await this.tasks.find({
       where: board.managers.find((m) => m.id === user.id)
         ? { board: { id: board.id } }
         : { board: { id: board.id }, responsible: { id: user.id } },
       loadRelationIds: true,
-    });
+    });*/
+    const isManager = board.managers.find((m) => m.id === user.id);
+    return this.tasks
+      .createQueryBuilder('task')
+      .innerJoinAndSelect('task.board', 'board')
+      .innerJoinAndSelect('task.responsible', 'responsible')
+      .where('board.id = :boardId', { boardId: board.id })
+      .where(!isManager ? 'responsible.id = :responsibleId' : 'TRUE', {
+        responsibleId: user.id,
+      })
+      .loadRelationCountAndMap('task.todosCount', 'task.todos')
+      .loadRelationCountAndMap(
+        'task.doneTodosCount',
+        'task.todos',
+        'doneTodo',
+        (qb) => {
+          return qb.where('doneTodo.checked = TRUE');
+        },
+      )
+      .loadAllRelationIds()
+      .getMany();
   }
 
   async getForTaskAccess(id: number) {
@@ -69,12 +89,17 @@ export class TasksService {
     const step = await this.stepsService.getFirst();
     const boardTasks = await this.getByBoard(dto.board);
 
+    for (const boardTask of boardTasks) {
+      boardTask.order++;
+      await this.tasks.save(boardTask);
+    }
+
     const newTask = this.tasks.create({
       ...dto,
       step,
       slice,
       responsible,
-      order: boardTasks.length,
+      order: 1,
       created: this.getCurrentDate(),
       updated: this.getCurrentDate(),
       starts: dto.starts ?? null,
@@ -94,13 +119,12 @@ export class TasksService {
       dto.board.slug,
       responsible.id,
     );
+
+    return newTask.id;
   }
 
   async changeOrder(to: number, id: number, board: Board, userId: number) {
     to = Number(to);
-    if (to < 0) {
-      throw Exception.BadRequest('order < 0');
-    }
 
     const task = await this.tasks.findOne({
       where: { id },
@@ -136,17 +160,19 @@ export class TasksService {
       await this.tasks.update(updatedId, updatedTask);
     }
 
-    this.socketService.send(
-      {
-        from: userId,
-        event: 'taskOrderChange',
-        content: [task, ...updatedTasks].map((t) => ({
-          taskId: t.id,
-          order: t.order,
-        })),
-      },
-      board.slug,
-    );
+    if (to !== -1) {
+      this.socketService.send(
+        {
+          from: userId,
+          event: 'taskOrderChange',
+          content: [task, ...updatedTasks].map((t) => ({
+            taskId: t.id,
+            order: t.order,
+          })),
+        },
+        board.slug,
+      );
+    }
   }
 
   async setReviewer(user: User, id: number, boardSlug: string) {
@@ -172,7 +198,37 @@ export class TasksService {
       {
         from: user.id,
         event: 'taskReviewerSet',
-        content: { taskId: task.id, reviewer: task.reviewer },
+        content: { taskId: task.id, reviewer: task.reviewer?.id ?? null },
+      },
+      boardSlug,
+      task.responsible.id,
+    );
+  }
+
+  async setReplacer(user: User, id: number, boardSlug: string) {
+    const task = await this.tasks.findOne({
+      where: { id },
+      relations: ['responsible', 'replacer'],
+    });
+
+    if (!task) {
+      throw Exception.NotFound('task');
+    }
+
+    if (task.replacer) {
+      task.replacer = null;
+    } else {
+      task.replacer = user;
+    }
+
+    this.update(task);
+    await this.tasks.update(id, task);
+
+    this.socketService.send(
+      {
+        from: user.id,
+        event: 'taskReplacerSet',
+        content: { taskId: task.id, isReplacing: !!task.replacer },
       },
       boardSlug,
       task.responsible.id,
@@ -254,14 +310,21 @@ export class TasksService {
       {
         from: userId,
         event: 'taskMetaChange',
-        content: task,
+        content: await this.getForResponse(task.id),
       },
       boardSlug,
       task.responsible.id ?? undefined,
     );
   }
 
-  async delete(id: number, boardSlug: string, userId: number) {
+  private async getForResponse(id: number) {
+    return await this.tasks.findOne({
+      where: { id },
+      loadRelationIds: true,
+    });
+  }
+
+  async delete(id: number, board: Board, userId: number) {
     const task = await this.tasks.findOne({
       where: { id },
       relations: ['responsible'],
@@ -270,6 +333,8 @@ export class TasksService {
       throw Exception.NotFound('task');
     }
 
+    await this.changeOrder(-1, id, board, userId);
+
     await this.tasks.remove(task);
     this.socketService.send(
       {
@@ -277,7 +342,7 @@ export class TasksService {
         event: 'taskDelete',
         content: id,
       },
-      boardSlug,
+      board.slug,
       task.responsible.id,
     );
   }

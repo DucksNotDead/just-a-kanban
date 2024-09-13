@@ -6,6 +6,7 @@ import {
   useCallback,
   useEffect,
   useImperativeHandle,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -16,11 +17,14 @@ import { CreateDialog } from 'shared/ui';
 import Styles from './BoardCreateDialog.module.scss';
 
 interface IProps {
+  data: IBoardWithUsers | null;
   onCreated: (board: IBoardWithUsers) => void;
+  onUpdated: (board: IBoardWithUsers) => void;
+  onClose: () => void;
 }
 
-export const BoardCreateDialog = forwardRef<IModalRef, IProps>(
-  ({ onCreated }, ref) => {
+export const BoardUpdateDialog = forwardRef<IModalRef, IProps>(
+  ({ data, onCreated, onUpdated, onClose }, ref) => {
     const boardsApi = useBoardsApi();
     const { message } = App.useApp();
     const { user } = useCurrentUser();
@@ -31,14 +35,26 @@ export const BoardCreateDialog = forwardRef<IModalRef, IProps>(
     const [pending, setPending] = useState(false);
     const dialog = useRef<IModalRef>(null);
 
+    const nameIsChanged = useMemo(() => {
+      return data?.name !== name;
+    }, [data, name]);
+
+    const usersIsChanged = useMemo(() => {
+      return (
+        data?.managers.join() !== managers.join() ||
+        data?.users.map((u) => u.id).join() !== users.map((u) => u.id).join()
+      );
+    }, [data, users, managers]);
+
     const handleClose = useCallback(() => {
+      onClose();
       setName(() => '');
       setUsers(() => []);
       setManagers(() => []);
-    }, []);
+    }, [onClose]);
 
     const handleCreateClick = useCallback(() => {
-      if (!user) {
+      if (!user || data) {
         return;
       }
       setPending(() => true);
@@ -61,7 +77,38 @@ export const BoardCreateDialog = forwardRef<IModalRef, IProps>(
         });
     }, [user, name, managers, users]);
 
-    const handleUsersChange = useCallback((data: IUser[]) => {
+    const handleUpdateClick = useCallback(async () => {
+      if (!data || !user) {
+        return;
+      }
+
+      setPending(() => true);
+      try {
+        if (usersIsChanged) {
+          await boardsApi.changeUsers(data.slug, {
+            managers: [...managers, user.id],
+            users: [...users.map((u) => u.id), user.id],
+          });
+        }
+
+        let slug = data.slug;
+        if (nameIsChanged) {
+          const updated = await boardsApi.changeName(data.slug, name);
+          if (updated) {
+            slug = updated.slug;
+          }
+        }
+
+        onUpdated({ ...data, users, managers, name, slug });
+      } catch {
+        message.error(appMessages.toasts.update.error);
+      } finally {
+        setPending(() => false);
+        dialog.current?.close();
+      }
+    }, [user, data, users, managers, name, nameIsChanged, usersIsChanged]);
+
+    const handleUsersSet = useCallback((data: IUser[]) => {
       setUsers(() => data);
     }, []);
 
@@ -79,22 +126,32 @@ export const BoardCreateDialog = forwardRef<IModalRef, IProps>(
     );
 
     useEffect(() => {
-      setIsReady(() => !!name.length);
-    }, [name]);
+      setName(() => data?.name ?? '');
+      setUsers(() => data?.users ?? []);
+      setManagers(() => data?.managers ?? []);
+    }, [data]);
 
-    useImperativeHandle(
-      ref,
-      () => ({
-        open: () => dialog.current?.open(),
-        close: () => dialog.current?.close(),
-        isOpen: !!dialog.current?.isOpen,
-      }),
-    );
+    useEffect(() => {
+      setIsReady(() => {
+        let updateReady = true;
+        if (data) {
+          updateReady = nameIsChanged || usersIsChanged;
+        }
+        return !!name.length && updateReady;
+      });
+    }, [name, nameIsChanged, usersIsChanged]);
+
+    useImperativeHandle(ref, () => ({
+      open: () => dialog.current?.open(),
+      close: () => dialog.current?.close(),
+      isOpen: !!dialog.current?.isOpen,
+    }));
 
     return (
       <CreateDialog
         ref={dialog}
-        onConfirm={handleCreateClick}
+        onConfirm={data ? handleUpdateClick : handleCreateClick}
+        action={data ? 'Изменить' : undefined}
         entity={'доску'}
         classname={Styles.Dialog}
         onClose={handleClose}
@@ -111,7 +168,11 @@ export const BoardCreateDialog = forwardRef<IModalRef, IProps>(
               setName(() => target.value);
             }}
           />
-          <UserSelect onChange={handleUsersChange} multiple />
+          <UserSelect
+            value={users.map((u) => u.id)}
+            onChange={handleUsersSet}
+            multiple
+          />
         </div>
         {!users.length ? (
           <p>В этой доске будете только вы</p>
@@ -132,6 +193,7 @@ export const BoardCreateDialog = forwardRef<IModalRef, IProps>(
                 description={null}
               />
               <Switch
+                checked={!!managers.find((mId) => mId === user.id)}
                 onChange={(checked) =>
                   handleManagerSwitchToggle(user.id, checked)
                 }

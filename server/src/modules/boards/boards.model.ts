@@ -46,8 +46,8 @@ export class Board {
   slices: Slice[];
 
   @Column(DATA_HIDDEN)
-  doneTasksCount: number;
+  tasksCount: number;
 
   @Column(DATA_HIDDEN)
-  undoneTasksCount: number;
+  doneTasksCount: number;
 }

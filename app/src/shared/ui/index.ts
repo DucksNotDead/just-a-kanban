@@ -6,4 +6,6 @@ export { Select } from './Select/Select';
 
 export { AnimatedList } from './AnimatedList/AnimatedList';
 
-export { DateTimePicker } from 'shared/ui/DateTimePicker/DateTimePicker'
+export { DateTimePicker } from 'shared/ui/DateTimePicker/DateTimePicker';
+
+export { LoadingProgress } from './LoadingProgress/LoadingProgress';

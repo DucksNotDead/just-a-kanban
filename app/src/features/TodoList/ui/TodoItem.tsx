@@ -1,19 +1,19 @@
 import { Checkbox, Spin } from 'antd';
-import { CheckboxChangeEvent } from 'antd/es/checkbox';
 import TextArea from 'antd/es/input/TextArea';
+import { useTodosApi } from 'entities/todo';
 import { todoTransitionConfig } from 'features/TodoList/config/todoTransitionConfig';
 import { AnimatePresence, motion } from 'framer-motion';
-import { FocusEvent, FormEvent, KeyboardEvent } from 'react';
+import { FocusEvent, FormEvent, KeyboardEvent, useCallback } from 'react';
+import { usePending } from 'shared/utils';
 
 import { ITodoListItem } from '../model/types/todoListTypes';
 
 import Styles from './TodoItem.module.scss';
 
 interface IProps {
+  taskId: number | null;
   todo: ITodoListItem;
-  onToggle: (e: CheckboxChangeEvent, itemKey: string) => void;
   editMode: boolean;
-  togglePending: boolean;
   toggleAccess: boolean;
   onInput: (e: FormEvent<HTMLTextAreaElement>, itemKey: string) => void;
   onKeyPress: (e: KeyboardEvent<HTMLTextAreaElement>, itemKey: string) => void;
@@ -24,19 +24,28 @@ const { pendingMotionProps, checkboxMotionProps, duration } =
   todoTransitionConfig;
 
 export function TodoItem({
+  taskId,
   todo,
   onInput,
-  onToggle,
-  togglePending,
   toggleAccess,
   onKeyPress,
   onBlur,
   editMode,
 }: IProps) {
+  const { toggle } = useTodosApi();
+
+  const [togglePending, setTogglePending] = usePending(false);
+
+  const handleToggle = useCallback(() => {
+    if (todo.id && taskId) {
+      setTogglePending(() => true);
+      toggle(todo.id, taskId).finally(() => setTogglePending(() => false));
+    }
+  }, [todo]);
 
   return (
     <div className={Styles.TodoItem}>
-      <AnimatePresence mode={'popLayout'} initial={false}>
+      <AnimatePresence mode={'popLayout'}>
         {editMode ? (
           <motion.div
             key={'edit'}
@@ -55,7 +64,7 @@ export function TodoItem({
                   <Checkbox
                     disabled={!toggleAccess}
                     checked={todo.checked}
-                    onChange={(e) => onToggle(e, todo.key)}
+                    onChange={handleToggle}
                   />
                 </motion.div>
               )}
@@ -63,7 +72,11 @@ export function TodoItem({
           </motion.div>
         )}
       </AnimatePresence>
-      <motion.div layout={'position'} transition={{ duration }} className={Styles.TodoTextAreaBlock}>
+      <motion.div
+        layout={'position'}
+        transition={{ duration }}
+        className={Styles.TodoTextAreaBlock}
+      >
         <TextArea
           value={todo.label}
           variant={'borderless'}

@@ -2,6 +2,7 @@ export const appMessages = {
   toasts: {
     login: { error: 'Ошибка входа' },
     create: { error: 'Ошибка создания' },
+    update: { error: 'Ошибка изменения' },
     delete: { error: 'Ошибка удаления' },
     usersList: { error: 'Ошибка получения пользователей' }
   },

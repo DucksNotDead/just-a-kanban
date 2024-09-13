@@ -1,7 +1,4 @@
-@use 'sass:list' as list;
-
 $bg: var(--c-medium-grey);
-$colors: --c-azure, --c-rose, --c-gold, --c-green;
 
 .StepBox {
   position: relative;
@@ -9,7 +6,6 @@ $colors: --c-azure, --c-rose, --c-gold, --c-green;
   width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
   border-radius: var(--md);
   background-color: $bg;
   overflow-y: auto;
@@ -25,9 +21,6 @@ $colors: --c-azure, --c-rose, --c-gold, --c-green;
   @for $i from 1 through 4 {
     &:nth-child(#{$i}) {
       transition-delay: #{(4 - $i) * 50}ms;
-      .Header {
-        color: var(list.nth($colors, $i));
-      }
     }
   }
 }
@@ -53,8 +46,6 @@ $colors: --c-azure, --c-rose, --c-gold, --c-green;
   flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: var(--md);
   padding: var(--md) var(--md) 0;
 
   h4 {

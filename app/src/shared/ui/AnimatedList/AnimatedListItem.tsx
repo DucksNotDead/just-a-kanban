@@ -13,13 +13,15 @@ import Styles from './AnimatedListItem.module.scss';
 
 interface IProps<T> {
   item: T;
+  index: number;
   keyProp: keyof T;
   reorder?: IReorderProps<T>;
-  renderItem: (item: T, control?: ReactNode) => ReactNode;
+  renderItem: (item: T, control?: ReactNode, index?: number) => ReactNode;
 }
 
 export function AnimatedListItem<T>({
   item,
+  index,
   keyProp,
   reorder,
   renderItem,
@@ -28,20 +30,15 @@ export function AnimatedListItem<T>({
 
   return (
     <Reorder.Item
+      as={'div'}
       id={item[keyProp] as string}
       key={item[keyProp] + '_reorderItem'}
       value={item}
-      variants={{
-        ...appTransitions.fade,
-        drag: appTransitions.scale.hidden,
-      }}
-      initial={'hidden'}
-      animate={'visible'}
-      exit={'hidden'}
-      whileDrag={'drag'}
+      whileDrag={appTransitions.scale.variants.hidden}
       dragListener={false}
       dragControls={controls}
-      transition={{ duration: .15 }}
+      transition={{ duration: 0.15 }}
+      {...appTransitions.fade}
     >
       {renderItem(
         item,
@@ -50,15 +47,13 @@ export function AnimatedListItem<T>({
             <motion.div
               className={Styles.Control}
               data-key={item[keyProp] + '_dragControl'}
-              variants={appTransitions.scaleFull}
-              initial={'hidden'}
-              animate={'visible'}
-              exit={'hidden'}
+              {...appTransitions.scaleFull}
             >
               <Grip onPointerDown={(e) => controls.start(e)} />
             </motion.div>
           )}
         </AnimatePresence>,
+        index,
       )}
     </Reorder.Item>
   );

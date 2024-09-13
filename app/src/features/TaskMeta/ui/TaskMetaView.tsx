@@ -10,9 +10,10 @@ import Styles from './TaskMetaView.module.scss';
 interface IProps {
   taskMeta: ITaskMeta;
   onEditClick: () => void;
+  hasEditAccess: boolean;
 }
 
-export function TaskMetaView({ taskMeta, onEditClick }: IProps) {
+export function TaskMetaView({ taskMeta, onEditClick, hasEditAccess }: IProps) {
   const { getUser } = useBoardUsers();
   const user = useMemo(
     () => getUser(taskMeta.responsible),
@@ -22,8 +23,8 @@ export function TaskMetaView({ taskMeta, onEditClick }: IProps) {
   return (
     <motion.div
       className={Styles.TaskMeta}
-      whileTap={{ scale: 0.95 }}
-      onClick={onEditClick}
+      whileTap={hasEditAccess ? { scale: 0.95 } : undefined}
+      onClick={hasEditAccess ? onEditClick : undefined}
     >
       <div className={Styles.TaskMetaLeft}>
         <div className={Styles.TaskMetaTags}>
@@ -42,13 +43,15 @@ export function TaskMetaView({ taskMeta, onEditClick }: IProps) {
           <CalendarClock /> {taskMeta.deadline}
         </div>
       </div>
-      <motion.div
-        initial={{ opacity: 0 }}
-        whileHover={{ opacity: 1 }}
-        className={Styles.TaskMetaEditMask}
-      >
-        Изменить
-      </motion.div>
+      {hasEditAccess && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileHover={{ opacity: 1 }}
+          className={Styles.TaskMetaEditMask}
+        >
+          Изменить
+        </motion.div>
+      )}
     </motion.div>
   );
 }

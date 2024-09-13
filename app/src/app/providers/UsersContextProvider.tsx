@@ -1,6 +1,7 @@
 import { useBoard } from 'entities/board';
 import { IUser, useUsersApi, usersContext } from 'entities/user';
 import { ReactNode, useCallback, useEffect, useState } from 'react';
+import { usePending } from 'shared/utils';
 
 interface IProps {
   children: ReactNode;
@@ -9,7 +10,7 @@ interface IProps {
 export function UsersContextProvider({ children }: IProps) {
   const usersApi = useUsersApi();
   const { board } = useBoard();
-  const [pending, setPending] = useState(true);
+  const [usersPending, setUsersPending] = usePending()
   const [users, setUsers] = useState<IUser[]>([]);
 
   const getUser = useCallback(
@@ -18,16 +19,16 @@ export function UsersContextProvider({ children }: IProps) {
   );
 
   useEffect(() => {
-    setPending(() => true);
+    setUsersPending(() => true);
     (board ? usersApi.getUsersInBoard(board.slug) : usersApi.adminGetUsers())
       .then((data) => {
-        data && setUsers(() => data);
+        setUsers(() => data ?? []);
       })
-      .finally(() => setPending(() => false));
+      .finally(() => setUsersPending(() => false));
   }, [board]);
 
   return (
-    <usersContext.Provider value={{ users, usersPending: pending, getUser }}>
+    <usersContext.Provider value={{ users, usersPending, getUser }}>
       {children}
     </usersContext.Provider>
   );

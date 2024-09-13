@@ -27,11 +27,7 @@ export function StepBox({ step: { id, name }, children, isReady }: IProps) {
           title={name.slice(0, 1).toUpperCase() + name.slice(1).toLowerCase()}
         >
           {!isReady ? null : (
-            <motion.div
-              variants={appTransitions.scaleFull}
-              initial={'hidden'}
-              animate={'visible'}
-            >
+            <motion.div {...appTransitions.scaleFull}>
               {stepIcons[id - 1]}
             </motion.div>
           )}

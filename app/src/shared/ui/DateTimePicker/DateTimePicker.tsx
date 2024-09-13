@@ -32,12 +32,12 @@ export function DateTimePicker({ min, onChange, value }: IProps) {
       const sameAsCurrent =
         date.year() === current?.year() &&
         date.month() === current.month() &&
-        date.day() === current.day();
+        date.date() === current.date();
 
       const sameAsMin =
         date.year() === min?.year() &&
         date.month() === min.month() &&
-        date.day() === min.day();
+        date.date() === min.date();
 
       if (sameAsMin) {
         return {

@@ -9,9 +9,9 @@ import { useTodoListItems } from '../model/useTodoListItems';
 import Styles from './TodoList.module.scss';
 
 interface IProps {
+  taskId: number | null;
   value: ITodo[];
   onChange: (value: ITodoListItem[]) => void;
-  loading: boolean;
   editMode: boolean;
   toggleAccess: boolean;
 }
@@ -20,9 +20,9 @@ const containerClassName = 'todoList';
 const itemClassName = 'todoItem';
 
 export function TodoList({
+  taskId,
   value,
   onChange,
-  loading,
   editMode,
   toggleAccess,
 }: IProps) {
@@ -30,7 +30,6 @@ export function TodoList({
 
   const {
     listRef,
-    handleToggle,
     handleInput,
     handleInputKeyPress,
     handleBlur,
@@ -59,11 +58,10 @@ export function TodoList({
             data-key={todo.key}
           >
             <TodoItem
+              taskId={taskId}
               editMode={editMode}
               todo={todo}
-              togglePending={loading}
               toggleAccess={toggleAccess}
-              onToggle={handleToggle}
               onInput={handleInput}
               onKeyPress={handleInputKeyPress}
               onBlur={handleBlur}

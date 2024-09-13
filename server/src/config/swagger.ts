@@ -15,7 +15,7 @@ const examples = {
   USERNAME: 'john1234',
   PASSWORD: 'StrongPassword!1234',
   TASK_TITLE: 'Awesome task',
-  TASK_ORDER: 3,
+  ORDER: 3,
   TODO_LABEL: 'Poo bananas',
   TODOS: [{ label: 'Poo bananas' }],
   DATE: '01-01-1970T00:00',

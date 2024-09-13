@@ -7,8 +7,12 @@ interface IBoardBase {
 }
 
 interface IBoardTaskProgressBase {
+  tasksCount: number;
   doneTasksCount: number;
-  undoneTasksCount: number;
+}
+
+interface IBoardWithManagerIds {
+  managers: number[];
 }
 
 export interface IBoard
@@ -16,13 +20,15 @@ export interface IBoard
     IBoardTaskProgressBase,
     IBoardChangeUsersRequest {}
 
-export interface IBoardWithUsers extends IBoardBase, IBoardTaskProgressBase {
+export interface IBoardWithUsers
+  extends IBoardBase,
+    IBoardWithManagerIds,
+    IBoardTaskProgressBase {
   users: IUser[];
 }
 
-export interface IBoardChangeUsersRequest {
+export interface IBoardChangeUsersRequest extends IBoardWithManagerIds{
   users: number[];
-  managers: number[];
 }
 
 export interface IBoardCreateRequest extends IBoardChangeUsersRequest {
@@ -31,6 +37,6 @@ export interface IBoardCreateRequest extends IBoardChangeUsersRequest {
 
 export interface IBoardContext {
   board: IBoard | null;
-  pending: boolean;
+  boardPending: boolean;
   hasManagerAccess: boolean;
 }

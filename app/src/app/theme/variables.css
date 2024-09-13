@@ -18,4 +18,5 @@
   --xl: calc(var(--sm) * 4);
 
   --tr-sm: 200ms;
+  --tr-md: 500ms;
 }

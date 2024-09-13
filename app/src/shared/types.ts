@@ -12,3 +12,8 @@ export interface IReorderProps<T> {
   axis?: 'x' | 'y';
   constraints?: Partial<BoundingBox>;
 }
+
+export interface IReducerDispatchFnArgsGen<E extends string, D> {
+  type: E;
+  data: D;
+}

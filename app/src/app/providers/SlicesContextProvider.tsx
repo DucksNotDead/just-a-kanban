@@ -5,8 +5,9 @@ import {
   slicesContext,
   useSlicesApi,
 } from 'entities/slice';
-import { useSocket } from 'entities/socket';
+import { useSocket } from 'features/Socket';
 import { ReactNode, useCallback, useEffect, useState } from 'react';
+import { usePending } from 'shared/utils';
 
 interface IProps {
   children: ReactNode;
@@ -16,7 +17,7 @@ export function SlicesContextProvider({ children }: IProps) {
   const slicesApi = useSlicesApi();
   const { board } = useBoard();
   const [slices, setSlices] = useState<ISlice[]>([]);
-  const [slicesPending, setSlicesPending] = useState(true);
+  const [slicesPending, setSlicesPending] = usePending()
 
   const createSlice = useCallback(
     (dto: ISliceCreateRequest) => {
@@ -58,11 +59,16 @@ export function SlicesContextProvider({ children }: IProps) {
         .then((data) => setSlices(() => data ?? []))
         .finally(() => setSlicesPending(() => false));
     }
+
+    return () => {
+      setSlicesPending(() => false)
+      setSlices(() => [])
+    }
   }, [board]);
 
   return (
     <slicesContext.Provider
-      value={{ slicesPending: slicesPending, slices, createSlice, deleteSlice }}
+      value={{ slicesPending, slices, createSlice, deleteSlice }}
     >
       {children}
     </slicesContext.Provider>

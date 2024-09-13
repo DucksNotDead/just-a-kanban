@@ -11,7 +11,7 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  app.enableCors({ origin: process.env.CORS_ORIGIN });
+  app.enableCors({ origin: process.env.CORS_ORIGIN , methods: '*'});
 
   app.useStaticAssets(join(__dirname, '..', 'media'), {
     prefix: '/media/',

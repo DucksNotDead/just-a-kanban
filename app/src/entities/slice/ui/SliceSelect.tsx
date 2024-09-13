@@ -119,11 +119,9 @@ export function SliceSelect({ value, onChange, editMode, filled }: IProps) {
         pending={slicesPending}
         renderOption={renderOption}
         menuHeader={
-          editMode && (
-            <Button onClick={handleCreateClick} style={{ width: '100%' }}>
-              Добавить слайс
-            </Button>
-          )
+          <Button onClick={handleCreateClick} style={{ width: '100%' }}>
+            Добавить слайс
+          </Button>
         }
       />
       <SliceCreateDialog

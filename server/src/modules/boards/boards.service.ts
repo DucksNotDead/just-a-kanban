@@ -1,7 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import genSlug from 'limax';
-import { DeepPartial, EntityManager, FindOptionsWhere, In, Repository, SelectQueryBuilder } from 'typeorm';
+import {
+  DeepPartial,
+  EntityManager,
+  FindOptionsWhere,
+  In,
+  Repository,
+  SelectQueryBuilder,
+} from 'typeorm';
 
 import { Board } from './boards.model';
 import { BoardChangeUsersDto } from './dto/board-change-users-dto';
@@ -111,7 +118,7 @@ export class BoardsService {
     candidate.slug = this.genSlug(name);
 
     await this.manager.save(candidate);
-    return this.getBySlug(slug);
+    return { slug: candidate.slug };
   }
 
   async changeUsers(
@@ -142,8 +149,8 @@ export class BoardsService {
   async delete(boardSlug: string) {
     const board = await this.boards.findOne({
       where: { slug: boardSlug },
-      relations: { tasks: true, slices: true }
-    })
+      relations: { tasks: true, slices: true },
+    });
 
     const id = board.id;
 
@@ -161,25 +168,20 @@ export class BoardsService {
           return qb.where('doneTask.step.id = 4');
         },
       )
-      .loadRelationCountAndMap(
-        'board.undoneTasksCount',
-        'board.tasks',
-        'undoneTask',
-        (qb) => {
-          return qb.where('undoneTask.step.id != 4');
-        },
-      );
+      .loadRelationCountAndMap('board.tasksCount', 'board.tasks');
   }
 
   private getBoardWithUsersQB(userId?: number) {
     const qb = this.boards.createQueryBuilder('board');
     return this.getBoardTasksProgressQB(
-      userId
+      (userId
         ? qb
             .innerJoinAndSelect('board.users', 'user')
             .where('user.id = :userId', { userId })
-            .innerJoinAndMapMany('board.users', 'board.users', 'allUsers')
-        : qb.innerJoinAndMapMany('board.users', 'board.users', 'allUsers'),
+        : qb
+      )
+        .innerJoinAndMapMany('board.users', 'board.users', 'allUsers')
+        .loadRelationIdAndMap('board.managers', 'board.managers'),
     );
   }
 

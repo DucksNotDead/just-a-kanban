@@ -16,8 +16,8 @@ export function useTodosApi() {
 
   return {
     get: async (taskId: number) => await connect<ITodo[]>(urls.task(taskId)),
-    create: async (taskId: number, dto: ITodoCreateRequest) =>
-      await connect(urls.task(taskId), 'post', dto),
+    change: async (taskId: number, dto: ITodoCreateRequest) =>
+      await connect(urls.task(taskId), 'put', dto),
     toggle: async (todoId: number, taskId: number) =>
       await connect(urls.item(taskId, todoId), 'patch'),
   };

@@ -1,10 +1,10 @@
-import { ITaskAccess, ITaskCreateRequest, ITaskFull } from 'entities/task';
+import { ITaskCreateRequest, ITaskFull } from 'entities/task';
 import { useConnect } from 'shared/utils';
 
 const urls = {
   base: '/tasks',
   board(slug: string) {
-    return `${this.base}/${slug}`;
+    return `${this.base}/board/${slug}`;
   },
   item(id: number, postfix: 'meta' | 'order' | 'step' | 'reviewer' | '' = '') {
     return `${this.base}/${id}${postfix.length ? `/${postfix}` : ''}`;
@@ -23,10 +23,8 @@ export function useTasksApi() {
   return {
     get: async (boardSlug: string) =>
       await connect<ITaskFull[]>(urls.board(boardSlug)),
-    getAccess: async (taskId: number) =>
-      await connect<ITaskAccess>(urls.item(taskId)),
     create: async (boardSlug: string, dto: ITaskCreateRequest) =>
-      await connect(urls.board(boardSlug), 'post', dto),
+      await connect<number>(urls.board(boardSlug), 'post', dto),
     changeOrder: async (taskId: number, order: number) =>
       await connect(urls.order(taskId, order), 'patch'),
     changeStep: async (
@@ -38,6 +36,6 @@ export function useTasksApi() {
       await connect(urls.item(taskId, 'meta'), 'patch', dto),
     setReviewer: async (taskId: number) =>
       await connect(urls.item(taskId, 'reviewer'), 'patch'),
-    delete: async (taskId: number) => await connect(urls.item(taskId)),
+    delete: async (taskId: number) => await connect(urls.item(taskId), 'delete'),
   };
 }

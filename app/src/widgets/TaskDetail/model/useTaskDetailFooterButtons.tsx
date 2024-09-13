@@ -1,5 +1,6 @@
-import { Button } from 'antd';
+import { Button, Space } from 'antd';
 import { useMemo } from 'react';
+import { useDeleteConfirm } from 'shared/utils';
 
 import { TEditMode } from './types/taskDetailTypes';
 
@@ -10,33 +11,47 @@ interface IPrimaryButtonProps {
 }
 
 export function useTaskDetailFooterButtons({
+  hasEditAccess,
   editMode,
+  todosChanged,
   setEditMode,
-  setIsOpen,
+  onCancel,
   onTodosSave,
   onMetaSave,
+  onTaskDelete,
   metaReady,
   createMode,
+  loading,
+  todosReady,
 }: {
+  hasEditAccess: boolean;
+  todosReady: boolean;
   editMode: TEditMode;
+  todosChanged: boolean;
   setEditMode: (mode: TEditMode) => void;
-  setIsOpen: (open: boolean) => void;
+  onCancel: () => void;
   onTodosSave: () => void;
   onMetaSave: () => void;
+  onTaskDelete: () => Promise<void>;
   metaReady: boolean;
   createMode: boolean;
+  loading: boolean;
 }) {
+  const { confirmDelete } = useDeleteConfirm('задачу');
+
   const primaryButtonProps = useMemo<IPrimaryButtonProps>(() => {
     switch (editMode) {
       case null: {
         return {
           label: 'Редактировать',
           callback: () => setEditMode('todos'),
+          disabled: !todosReady,
         };
       }
       case 'todos': {
         return {
           label: 'Сохранить',
+          disabled: !todosChanged,
           callback: () => {
             setEditMode(null);
             onTodosSave();
@@ -49,27 +64,63 @@ export function useTaskDetailFooterButtons({
           disabled: !metaReady,
           callback: () => {
             setEditMode(createMode ? 'todos' : null);
-            onMetaSave();
+            !createMode && onMetaSave();
           },
         };
       }
     }
-  }, [editMode, setEditMode, onTodosSave, onMetaSave, metaReady, createMode]);
+  }, [
+    todosReady,
+    editMode,
+    setEditMode,
+    onTodosSave,
+    onMetaSave,
+    metaReady,
+    createMode,
+    todosChanged,
+  ]);
 
   return useMemo(
     () => [
-      <Button key={'close-button'} onClick={() => setIsOpen(false)}>
-        Отмена
-      </Button>,
       <Button
-        key={'save-edit-button'}
-        type={'primary'}
-        disabled={primaryButtonProps.disabled}
-        onClick={primaryButtonProps.callback}
+        key={'close-button'}
+        onClick={() => (editMode ? setEditMode(null) : onCancel())}
       >
-        {primaryButtonProps.label}
+        {editMode ? 'Отмена' : 'Закрыть'}
       </Button>,
+      ...(hasEditAccess || createMode
+        ? [
+            <Space key={'edit-buttons'}>
+              {!createMode && !editMode && (
+                <Button
+                  danger
+                  key={'delete-button'}
+                  type={'primary'}
+                  onClick={() => confirmDelete(onTaskDelete)}
+                >
+                  Удалить
+                </Button>
+              )}
+              <Button
+                key={'save-edit-button'}
+                type={'primary'}
+                disabled={primaryButtonProps.disabled}
+                onClick={primaryButtonProps.callback}
+                loading={loading}
+              >
+                {primaryButtonProps.label}
+              </Button>
+            </Space>,
+          ]
+        : []),
     ],
-    [primaryButtonProps, setIsOpen, setEditMode],
+    [
+      primaryButtonProps,
+      setEditMode,
+      hasEditAccess,
+      createMode,
+      editMode,
+      onCancel,
+    ],
   );
 }

@@ -1,4 +1,6 @@
+export type TStep = 1|2|3|4
+
 export interface IStep {
-  id: number;
+  id: TStep;
   name: string
 }

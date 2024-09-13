@@ -12,4 +12,17 @@
     gap: var(--xl);
     padding: var(--lg) var(--xl) var(--xl);
   }
+  &TaskCardsBox {
+    display: flex;
+    flex-direction: column;
+    margin-top: var(--sm);
+    gap: var(--lg);
+  }
+}
+
+.TestCard {
+  width: 100%;
+  height: 90px;
+  background-color: var(--c-dark-grey);
+  border-radius: 18px;
 }

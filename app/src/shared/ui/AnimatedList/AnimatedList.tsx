@@ -6,7 +6,7 @@ import { AnimatedListItem } from './AnimatedListItem';
 
 interface ListProps<T> {
   dataSource: T[];
-  renderItem: (item: T, control?: ReactNode) => ReactNode;
+  renderItem: (item: T, control?: ReactNode, index?: number) => ReactNode;
   keyProp: keyof T;
   className?: string;
   reorder?: IReorderProps<T>;
@@ -25,13 +25,15 @@ export function AnimatedList<T>({
       axis={reorder?.axis}
       onReorder={reorder ? reorder.setter : () => {}}
       values={dataSource}
-      className={`${className} ${reorder?.active ? 'noselect' : ''}`}
+      className={`${className ?? ''}${reorder?.active ? ' noselect' : ''}`}
+      layoutScroll
     >
       <AnimatePresence initial={false}>
-        {dataSource.map((item) => (
+        {dataSource.map((item, index) => (
           <AnimatedListItem
             key={item[keyProp] as string}
             item={item}
+            index={index}
             keyProp={keyProp}
             renderItem={renderItem}
             reorder={reorder}
