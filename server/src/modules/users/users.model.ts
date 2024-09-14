@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-import { DATA_BIG_STRING } from '../../config/db';
+import { DATA_STRING } from '../../config/db';
 import { ApiField } from '../../config/swagger';
 import { Board } from '../boards/boards.model';
 import { Comment } from '../comments/comments.model';
@@ -20,11 +20,11 @@ export class User {
   id: number;
 
   @ApiField('USERNAME')
-  @Column({ ...DATA_BIG_STRING, unique: true })
+  @Column({ ...DATA_STRING, unique: true })
   username: string;
 
   @ApiField('NAME')
-  @Column(DATA_BIG_STRING)
+  @Column(DATA_STRING)
   name: string;
 
   @ApiField('PASSWORD')
@@ -56,12 +56,6 @@ export class User {
     nullable: true,
   })
   reviewTask: Task;
-
-  @OneToOne(() => Task, (task) => task.replacer, {
-    onDelete: 'SET NULL',
-    nullable: true,
-  })
-  replacingTask: Task;
 
   @ManyToMany(() => Board, (board) => board.users)
   boards: Board[];

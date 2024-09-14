@@ -25,6 +25,7 @@ const examples = {
   BOARD_NAME: 'Board Name',
   BOARD_SLUG: 'board-name',
   STEP_NAME: 'STEP NAME',
+  STEP_LABEL: 'Step label',
   COMMENT_TEXT: 'Вот тут кнопка не покрашена ;)',
   FILE: 'https://...'
 } as const;

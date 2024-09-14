@@ -1,7 +1,16 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { TaskCreateDto } from './dto/task-create-dto';
+import { TasksChangeOrderDto } from './dto/tasks-change-order-dto';
 import { ReqTaskId } from './task.decorator';
 import { TASK_ID_KEY } from './tasks.const';
 import { TasksService } from './tasks.service';
@@ -23,7 +32,7 @@ export class TasksController {
     params: [BOARD_SLUG_KEY],
   })
   @BoardAccess()
-  @Get(`/board/:${BOARD_SLUG_KEY}`)
+  @Get(`board/:${BOARD_SLUG_KEY}`)
   getAll(@ReqBoard() board: Board, @ReqUser() user: User) {
     return this.service.getByUserBoard(board, user);
   }
@@ -32,7 +41,7 @@ export class TasksController {
     params: [BOARD_SLUG_KEY],
   })
   @BoardAccess(true)
-  @Post(`/board/:${BOARD_SLUG_KEY}`)
+  @Post(`board/:${BOARD_SLUG_KEY}`)
   create(
     @ReqBoard() board: Board,
     @ReqUser() user: User,
@@ -42,17 +51,17 @@ export class TasksController {
   }
 
   @ApiMethod('Change task order in step (board manager access)', {
-    params: [TASK_ID_KEY, 'order'],
+    params: [BOARD_SLUG_KEY],
+    body: TasksChangeOrderDto,
   })
   @BoardAccess(true)
-  @Patch(`:${TASK_ID_KEY}/order/:order`)
+  @Patch(`board/:${BOARD_SLUG_KEY}`)
   changeOrder(
     @ReqBoard() board: Board,
-    @ReqTaskId() id: number,
     @ReqUser() user: User,
-    @Param('order') order: number,
+    @Body() dto: TasksChangeOrderDto,
   ) {
-    return this.service.changeOrder(order, id, board, user.id);
+    return this.service.changeOrder(dto, board, user.id);
   }
 
   @ApiMethod('Change task step (board manager access)', {
@@ -94,19 +103,6 @@ export class TasksController {
     @ReqBoard() board: Board,
   ) {
     return this.service.setReviewer(user, id, board.slug);
-  }
-
-  @ApiMethod('Set task replacer (task access)', {
-    params: [TASK_ID_KEY],
-  })
-  @TaskAccess()
-  @Patch(`:${TASK_ID_KEY}/replacer`)
-  setReplacer(
-    @ReqUser() user: User,
-    @ReqTaskId() id: number,
-    @ReqBoard() board: Board,
-  ) {
-    return this.service.setReplacer(user, id, board.slug);
   }
 
   @ApiMethod('Change task meta (board manager access)', {

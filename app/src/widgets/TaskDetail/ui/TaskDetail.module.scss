@@ -14,6 +14,25 @@
     }
   }
 
+  &StepBadge {
+    position: absolute;
+    font-size: 12px;
+    padding: 2px var(--lg);
+    color: var(--c-medium-grey);
+    border-radius: 99px;
+    top: -30px;
+    right: 12px;
+  }
+
+  &FooterButtons {
+    display: flex;
+    justify-content: flex-end;
+
+    button {
+      margin-left: var(--md);
+    }
+  }
+
   :global {
     .ant-modal-footer {
       display: flex;

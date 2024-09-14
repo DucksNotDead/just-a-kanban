@@ -1,4 +1,4 @@
-import { App, Badge, Modal, Skeleton } from 'antd';
+import { App, Modal, Skeleton } from 'antd';
 import { useBoard } from 'entities/board';
 import { TStep, stepColors, useSteps } from 'entities/step';
 import {
@@ -27,6 +27,7 @@ import { taskDetailTransitionConfig } from '../config/taskDetailTransitionConfig
 import { TEditMode } from '../model/types/taskDetailTypes';
 import { useTaskDetailFooterButtons } from '../model/useTaskDetailFooterButtons';
 import { useTaskDetailTodosSocket } from '../model/useTaskDetailTodosSocket';
+import { useTaskDetailUsersInfoSocket } from '../model/useTaskDetailUsersInfoSocket';
 
 import Styles from './TaskDetail.module.scss';
 
@@ -35,6 +36,8 @@ export interface ITaskDetailRef {
 }
 
 const { todosMotionProps } = taskDetailTransitionConfig;
+
+const todosFilterFn = (todo: ITodo) => todo.label.trim().length;
 
 export const TaskDetail = forwardRef<ITaskDetailRef>((_, ref) => {
   const todosApi = useTodosApi();
@@ -120,10 +123,6 @@ export const TaskDetail = forwardRef<ITaskDetailRef>((_, ref) => {
   const handleTodosSave = useCallback(async () => {
     setUpdatePending(() => true);
 
-    const filterFn = (todo: ITodo) => todo.label.trim().length;
-
-    setTodos((prevState) => prevState.filter(filterFn));
-
     try {
       let id: number | null = taskId;
 
@@ -133,10 +132,9 @@ export const TaskDetail = forwardRef<ITaskDetailRef>((_, ref) => {
         setCreateMode(() => false);
       }
 
-      const todosToUpdate = todos.filter(filterFn);
-      if (id && todosToUpdate.length) {
+      if (id) {
         todosApi
-          .change(id, { todos: todosToUpdate })
+          .change(id, { todos: todos.filter(todosFilterFn) })
           .finally(() => setUpdatePending(() => false));
       }
     } catch {
@@ -163,11 +161,19 @@ export const TaskDetail = forwardRef<ITaskDetailRef>((_, ref) => {
 
   useTaskDetailTodosSocket(taskId, setSavedTodos, setTodosReadyPending);
 
+  useTaskDetailUsersInfoSocket(taskId, setTaskUsersInfo);
+
   useImperativeHandle(ref, () => ({ open }));
 
   useEffect(() => {
     setTodos(() => savedTodos.map((todo) => ({ ...todo })));
   }, [savedTodos]);
+
+  useEffect(() => {
+    if (editMode === null) {
+      setTodos((prevState) => prevState.filter(todosFilterFn));
+    }
+  }, [editMode]);
 
   const footerButtons = useTaskDetailFooterButtons({
     editMode,
@@ -176,18 +182,19 @@ export const TaskDetail = forwardRef<ITaskDetailRef>((_, ref) => {
     setEditMode,
     hasEditAccess,
     todosChanged,
+    hasReviewer: !!taskUsersInfo?.reviewer,
+    hasReviewerAccess: hasAccess('reviewer'),
     todosReady: !todosReadyPending,
     onCancel: handleDialogCancel,
     onTodosSave: handleTodosSave,
     onMetaSave: handleMetaSave,
     onTaskDelete: handleTaskDelete,
-    loading: updatePending,
   });
 
   return (
     <Modal
       destroyOnClose
-      width={600}
+      width={760}
       open={isOpen}
       onCancel={handleDialogCancel}
       onClose={handleDialogCancel}
@@ -197,9 +204,15 @@ export const TaskDetail = forwardRef<ITaskDetailRef>((_, ref) => {
       modalRender={(node) => {
         const step = steps.find((s) => s.id === taskStepId);
         return (
-          <Badge count={step?.name} color={step && stepColors[step.id]}>
+          <>
             {node}
-          </Badge>
+            <div
+              className={Styles.TaskDetailStepBadge}
+              style={{ backgroundColor: step && stepColors[step.id] }}
+            >
+              {step?.name}
+            </div>
+          </>
         );
       }}
     >
@@ -232,7 +245,8 @@ export const TaskDetail = forwardRef<ITaskDetailRef>((_, ref) => {
                     toggleAccess={
                       !createMode &&
                       hasAnyAccess(['responsible', 'reviewer']) &&
-                      taskStepId === 2
+                      !!taskStepId &&
+                      [2, 3].includes(taskStepId)
                     }
                   />
                 </motion.div>

@@ -3,7 +3,7 @@ import TextArea from 'antd/es/input/TextArea';
 import { useTodosApi } from 'entities/todo';
 import { todoTransitionConfig } from 'features/TodoList/config/todoTransitionConfig';
 import { AnimatePresence, motion } from 'framer-motion';
-import { FocusEvent, FormEvent, KeyboardEvent, useCallback } from 'react';
+import { FocusEvent, FormEvent, KeyboardEvent, useCallback, useState } from 'react';
 import { usePending } from 'shared/utils';
 
 import { ITodoListItem } from '../model/types/todoListTypes';
@@ -34,12 +34,16 @@ export function TodoItem({
 }: IProps) {
   const { toggle } = useTodosApi();
 
+  const [checked, setChecked] = useState(todo.checked);
   const [togglePending, setTogglePending] = usePending(false);
 
   const handleToggle = useCallback(() => {
     if (todo.id && taskId) {
       setTogglePending(() => true);
-      toggle(todo.id, taskId).finally(() => setTogglePending(() => false));
+      toggle(todo.id, taskId).finally(() => {
+        setTogglePending(() => false);
+        setChecked((prevState) => !prevState);
+      });
     }
   }, [todo]);
 
@@ -63,7 +67,7 @@ export function TodoItem({
                 <motion.div key={'static'} {...pendingMotionProps}>
                   <Checkbox
                     disabled={!toggleAccess}
-                    checked={todo.checked}
+                    checked={checked}
                     onChange={handleToggle}
                   />
                 </motion.div>

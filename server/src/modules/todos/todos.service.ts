@@ -80,8 +80,7 @@ export class TodosService {
   async toggle(id: number, boardSlug: string, userId: number) {
     const todo = await this.getOne(id);
     const task = await this.tasksService.getById(todo.task.id);
-    todo.checked = !todo.checked;
-    await this.todos.update(id, todo);
+    await this.todos.update(id, { checked: !todo.checked });
 
     this.socketService.send(
       {

@@ -3,7 +3,9 @@ import { ITaskCardStepAction } from 'widgets/TaskCard';
 
 export const getTaskCardStepActionsConfig = (
   taskReady: boolean,
-  onDeny: ITaskCardStepAction['onChoose'],
+  hasReviewer: boolean,
+  handleReviewerChange: ITaskCardStepAction['onChoose'],
+  onReviewDeny: ITaskCardStepAction['onChoose'],
 ): {
   [P in TStep]: ITaskCardStepAction[];
 } => ({
@@ -27,7 +29,7 @@ export const getTaskCardStepActionsConfig = (
       key: 'sendToReview',
       icon: 'ScanEye',
       access: 'responsible',
-      hidden: taskReady,
+      hidden: !taskReady,
     },
   ],
   3: [
@@ -35,20 +37,40 @@ export const getTaskCardStepActionsConfig = (
       toStepId: 1,
       key: 'deny',
       icon: 'MessageCircleReply',
-      access: 'manager',
-      onChoose: onDeny,
+      access: 'reviewer',
+      onChoose: onReviewDeny,
+      hidden: taskReady,
     },
     {
       toStepId: 4,
       key: 'approve',
       icon: 'ShieldCheck',
+      access: 'reviewer',
+      hidden: !taskReady,
+    },
+    {
+      toStepId: 3,
+      key: 'startReview',
+      label: 'Начать проверку',
+      icon: 'ClipboardList',
       access: 'manager',
+      hidden: hasReviewer,
+      onChoose: handleReviewerChange,
+    },
+    {
+      toStepId: 3,
+      key: 'closeReview',
+      label: 'Закончить проверять',
+      icon: 'ClipboardX',
+      access: 'reviewer',
+      onChoose: handleReviewerChange,
     },
   ],
   4: [
     {
       toStepId: 1,
       key: 'restart',
+      label: 'Вернуть в бэклог',
       icon: 'CornerUpLeft',
       access: 'manager',
     },

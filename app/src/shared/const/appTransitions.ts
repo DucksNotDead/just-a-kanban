@@ -26,4 +26,11 @@ export const appTransitions = {
     },
     ...base,
   },
+  layoutHeight: {
+    variants: {
+      hidden: { height: 0, opacity: 0 },
+      visible: { height: 'auto', opacity: 1 },
+    },
+    ...base,
+  }
 } as const;

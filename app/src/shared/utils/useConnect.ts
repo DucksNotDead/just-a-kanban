@@ -1,6 +1,8 @@
-import { API_BASE_URL, TOKEN_KEY } from 'shared/const';
+import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL, TOKEN_KEY, appRoutes } from 'shared/const';
 
 export function useConnect() {
+  const navigate = useNavigate();
   return function connect<T = void>(
     path: string,
     method: 'get' | 'post' | 'put' | 'patch' | 'delete' = 'get',
@@ -17,6 +19,9 @@ export function useConnect() {
         body: body ? JSON.stringify(body) : null,
       }).then(async (result) => {
         if (!result.ok) {
+          if (result.status === 401) {
+            navigate(appRoutes.login);
+          }
           resolve(null);
         } else {
           try {

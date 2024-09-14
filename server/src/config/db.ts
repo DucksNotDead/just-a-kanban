@@ -1,6 +1,4 @@
-export const DATA_BIG_STRING = { length: 40 };
-
-export const DATA_STRING = { length: 24 };
+export const DATA_STRING = { length: 60 };
 
 export const DATA_TEXT = { length: 120 };
 

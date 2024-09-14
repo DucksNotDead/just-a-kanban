@@ -23,10 +23,8 @@ export function useBoardPageTaskCardsSocket() {
   useSocket(
     {
       event: 'taskMetaChange',
-      callback: ({ from, content }) => {
-        if (user && user.id !== from) {
-          dispatchTasks({ type: 'changeMeta', data: content });
-        }
+      callback: ({ content }) => {
+        dispatchTasks({ type: 'changeMeta', data: content });
       },
     },
     [user],
@@ -43,6 +41,35 @@ export function useBoardPageTaskCardsSocket() {
     event: 'taskTodoToggle',
     callback: ({ content: { taskId, checked } }) => {
       dispatchTasks({ type: 'todoToggle', data: { taskId, checked } });
+    },
+  });
+
+  useSocket(
+    {
+      event: 'taskOrderChange',
+      callback: ({ from, content }) => {
+        if (user && from !== user.id) {
+          dispatchTasks({ type: 'changeOrder', data: content.tasks });
+        }
+      },
+    },
+    [user],
+  );
+
+  useSocket({
+    event: 'taskStepChange',
+    callback: ({ content }) => {
+      dispatchTasks({ type: 'changeStep', data: content });
+    },
+  });
+
+  useSocket({
+    event: 'taskReviewerSet',
+    callback: ({ content }) => {
+      dispatchTasks({
+        type: 'setReviewer',
+        data: { taskId: content.taskId, userId: content.reviewer },
+      });
     },
   });
 }

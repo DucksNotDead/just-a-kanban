@@ -21,12 +21,15 @@ export type TSocketSliceEvent = 'sliceCreate' | 'sliceUpdate' | 'sliceDelete';
 
 export type TSocketCommentEvent = 'commentCreate';
 
+export type TSocketStepEvent = 'stepReorderingStart' | 'stepReorderingEnd';
+
 export type TSocketClientEvent = 'join' | 'leave';
 
 export type TSocketEvent =
   | TSocketTaskEvent
   | TSocketSliceEvent
   | TSocketCommentEvent
+  | TSocketStepEvent
   | TSocketClientEvent;
 
 export interface ISocketMessage<T> {
@@ -52,4 +55,6 @@ export type TSocketFnArgs =
   | ISocketArgsGen<
       'taskTodoToggle',
       { taskId: number; todoId: number; checked: boolean }
-    >;
+    >
+  | ISocketArgsGen<'stepReorderingStart', { stepId: number }>
+  | ISocketArgsGen<'stepReorderingEnd', { stepId: number }>;

@@ -39,8 +39,12 @@ export class SocketService {
     }
   }
 
-  send(message: ISocketMessage, boardSlug: string, taskResponsibleId?: number) {
-    if (taskResponsibleId) {
+  send(
+    message: ISocketMessage,
+    boardSlug: string,
+    taskResponsibleId?: number | true,
+  ) {
+    if (taskResponsibleId && taskResponsibleId !== true) {
       const client = this.clients
         ? this.clients[this.toClientId(boardSlug, taskResponsibleId)]
         : null;

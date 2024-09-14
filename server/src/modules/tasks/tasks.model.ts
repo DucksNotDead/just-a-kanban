@@ -8,7 +8,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-import { DATA_BIG_STRING, DATA_DATE, DATA_HIDDEN } from '../../config/db';
+import { DATA_DATE, DATA_HIDDEN, DATA_STRING } from '../../config/db';
 import { ApiField } from '../../config/swagger';
 import { Board } from '../boards/boards.model';
 import { Comment } from '../comments/comments.model';
@@ -24,7 +24,7 @@ export class Task {
   id: number;
 
   @ApiField('TASK_TITLE')
-  @Column({ ...DATA_BIG_STRING, unique: true })
+  @Column({ ...DATA_STRING, unique: true })
   title: string;
 
   @ApiField('ORDER')
@@ -64,13 +64,6 @@ export class Task {
   })
   @JoinColumn()
   reviewer: User;
-
-  @OneToOne(() => User, (user) => user.replacingTask, {
-    onDelete: 'SET NULL',
-    nullable: true,
-  })
-  @JoinColumn()
-  replacer: User;
 
   @ManyToOne(() => Slice, (slice) => slice.tasks, {
     onDelete: 'SET NULL',

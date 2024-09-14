@@ -4,12 +4,14 @@ export const tasksReducer: TTasksReducer = (state, { type, data }) => {
   const stateWithChangedItem = (item: ITaskFull) => {
     const index = state.findIndex((s) => s.id === item.id);
 
-    if (!index) {
+    if (index === -1) {
       return state;
     }
 
     return [...state.slice(0, index), item, ...state.slice(index + 1)];
   };
+
+  const setNewArr = () => [...state.map((t) => ({ ...t }))];
 
   switch (type) {
     case 'get': {
@@ -17,7 +19,7 @@ export const tasksReducer: TTasksReducer = (state, { type, data }) => {
     }
 
     case 'create': {
-      const newArr = ([] as ITaskFull[]).concat(state);
+      const newArr = setNewArr();
       for (const prevTask of newArr) {
         prevTask.order++;
       }
@@ -25,9 +27,7 @@ export const tasksReducer: TTasksReducer = (state, { type, data }) => {
     }
 
     case 'delete': {
-      const newArr = ([] as ITaskFull[]).concat(
-        state.filter((t) => t.id !== data),
-      );
+      const newArr = setNewArr().filter((t) => t.id !== data);
       for (const index in newArr) {
         newArr[index].order = Number(index) + 1;
       }
@@ -36,6 +36,35 @@ export const tasksReducer: TTasksReducer = (state, { type, data }) => {
 
     case 'changeMeta': {
       return stateWithChangedItem(data);
+    }
+
+    case 'changeOrder': {
+      const newArr = setNewArr();
+      for (const { taskId, order } of data) {
+        newArr[newArr.findIndex((t) => t.id === taskId)].order = order;
+      }
+      return [...newArr];
+    }
+
+    case 'changeStep': {
+      const item = state.find((s) => s.id === data.taskId);
+      if (!item) {
+        return state;
+      }
+      if (item.step === 4 && data.stepId === 1) {
+        item.reviewer = null;
+      }
+      item.step = data.stepId;
+      return stateWithChangedItem(item);
+    }
+
+    case 'setReviewer': {
+      const item = state.find((t) => t.id === data.taskId);
+      if (!item) {
+        return state;
+      }
+      item.reviewer = data.userId;
+      return stateWithChangedItem(item);
     }
 
     case 'todosChange': {
@@ -56,9 +85,9 @@ export const tasksReducer: TTasksReducer = (state, { type, data }) => {
         return state;
       }
 
-      item.doneTodosCount = item.doneTodosCount + (data.checked ? 1 : -1);
-      
-      return stateWithChangedItem(item)
+      item.doneTodosCount = item.doneTodosCount + (data.checked ? -1 : 1);
+
+      return stateWithChangedItem(item);
     }
 
     case 'reset': {

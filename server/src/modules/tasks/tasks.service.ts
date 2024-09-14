@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { TaskCreateDto } from './dto/task-create-dto';
+import { TasksChangeOrderDto } from './dto/tasks-change-order-dto';
 import { Task } from './tasks.model';
 import { Exception } from '../../config/exception';
 import { Board } from '../boards/boards.model';
@@ -123,56 +124,36 @@ export class TasksService {
     return newTask.id;
   }
 
-  async changeOrder(to: number, id: number, board: Board, userId: number) {
-    to = Number(to);
+  async changeOrder(
+    { tasks }: TasksChangeOrderDto,
+    board: Board,
+    userId: number,
+  ) {
+    for (const { taskId, order } of tasks) {
+      await this.tasks.update(taskId, { order });
+    }
 
-    const task = await this.tasks.findOne({
-      where: { id },
-      relations: ['step', 'responsible'],
+    const { step } = await this.tasks.findOne({
+      where: { id: tasks[0].taskId },
+      relations: ['step'],
+      select: ['step', 'id'],
     });
 
-    const boardTasks = await this.getByBoard(board);
-
-    if (to > boardTasks.length - 1) {
-      throw Exception.BadRequest('order > step tasks count');
+    if (!step) {
+      throw Exception.NotFound('step');
     }
 
-    const from = task.order;
-    if (to === from) {
-      throw Exception.BadRequest('orders the same');
-    }
-
-    const [implementer, min, max] = from < to ? [-1, from, to] : [1, to, from];
-
-    const updatedTasks = boardTasks
-      .filter(({ order, id }) => {
-        return order >= min && order <= max && id !== task.id;
-      })
-      .map((task) => ({
-        ...task,
-        order: task.order + implementer,
-      }));
-
-    task.order = to;
-
-    for (const { id: updatedId, ...updatedTask } of [task, ...updatedTasks]) {
-      this.update({ ...updatedTask, id: updatedId });
-      await this.tasks.update(updatedId, updatedTask);
-    }
-
-    if (to !== -1) {
-      this.socketService.send(
-        {
-          from: userId,
-          event: 'taskOrderChange',
-          content: [task, ...updatedTasks].map((t) => ({
-            taskId: t.id,
-            order: t.order,
-          })),
+    this.socketService.send(
+      {
+        from: userId,
+        event: 'taskOrderChange',
+        content: {
+          stepId: step.id,
+          tasks,
         },
-        board.slug,
-      );
-    }
+      },
+      board.slug,
+    );
   }
 
   async setReviewer(user: User, id: number, boardSlug: string) {
@@ -205,36 +186,6 @@ export class TasksService {
     );
   }
 
-  async setReplacer(user: User, id: number, boardSlug: string) {
-    const task = await this.tasks.findOne({
-      where: { id },
-      relations: ['responsible', 'replacer'],
-    });
-
-    if (!task) {
-      throw Exception.NotFound('task');
-    }
-
-    if (task.replacer) {
-      task.replacer = null;
-    } else {
-      task.replacer = user;
-    }
-
-    this.update(task);
-    await this.tasks.update(id, task);
-
-    this.socketService.send(
-      {
-        from: user.id,
-        event: 'taskReplacerSet',
-        content: { taskId: task.id, isReplacing: !!task.replacer },
-      },
-      boardSlug,
-      task.responsible.id,
-    );
-  }
-
   async responsibleChangeStep(
     to: number,
     id: number,
@@ -247,7 +198,7 @@ export class TasksService {
       throw Exception.AccessDenied();
     }
 
-    if (to === 2 && (await this.todosService.hasUnchecked(id))) {
+    if (to === 3 && (await this.todosService.hasUnchecked(id))) {
       throw Exception.BadRequest('task undone');
     }
     await this.changeStep(to, task, boardSlug, userId);
@@ -270,12 +221,10 @@ export class TasksService {
     }
     if (to === 1) {
       const todos = await this.todosService.getByTask(task.id);
-      if (todos.length && !(await this.todosService.hasUnchecked(id))) {
-        throw Exception.NotFound('unchecked todos');
+      for (const {id} of todos) {
+        await this.todosService.toggle(id, boardSlug, user.id)
       }
-      if (task.reviewer) {
-        task.reviewer = null;
-      }
+      task.reviewer = null;
     }
     await this.changeStep(to, task, boardSlug, user.id);
   }
@@ -333,7 +282,14 @@ export class TasksService {
       throw Exception.NotFound('task');
     }
 
-    await this.changeOrder(-1, id, board, userId);
+    const boardTasks = await this.getByBoard(board);
+    const taskIndex = boardTasks.findIndex((t) => t.id === id);
+    for (const boardTaskIndex in boardTasks) {
+      if (Number(boardTaskIndex) > taskIndex) {
+        const boardTask = boardTasks[boardTaskIndex];
+        await this.tasks.update(boardTask.id, { order: boardTask.order - 1 });
+      }
+    }
 
     await this.tasks.remove(task);
     this.socketService.send(
@@ -401,9 +357,9 @@ export class TasksService {
 
     this.socketService.send(
       {
-        from: task.responsible.id,
-        event: 'taskChangeStep',
-        content: { taskId: task.id, step: to },
+        from: userId,
+        event: 'taskStepChange',
+        content: { taskId: task.id, stepId: to },
       },
       boardSlug,
       userId,

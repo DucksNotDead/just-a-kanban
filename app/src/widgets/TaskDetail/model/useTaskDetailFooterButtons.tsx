@@ -1,8 +1,10 @@
-import { Button, Space } from 'antd';
+import { Badge, Button } from 'antd';
 import { useMemo } from 'react';
+import { AnimatedList } from 'shared/ui';
 import { useDeleteConfirm } from 'shared/utils';
 
 import { TEditMode } from './types/taskDetailTypes';
+import Styles from '../ui/TaskDetail.module.scss';
 
 interface IPrimaryButtonProps {
   label: string;
@@ -10,8 +12,16 @@ interface IPrimaryButtonProps {
   disabled?: boolean;
 }
 
+interface IActionButton extends IPrimaryButtonProps {
+  key: string;
+  visible: boolean;
+  type?: 'danger' | 'default';
+}
+
 export function useTaskDetailFooterButtons({
   hasEditAccess,
+  hasReviewer,
+  hasReviewerAccess,
   editMode,
   todosChanged,
   setEditMode,
@@ -21,10 +31,11 @@ export function useTaskDetailFooterButtons({
   onTaskDelete,
   metaReady,
   createMode,
-  loading,
   todosReady,
 }: {
   hasEditAccess: boolean;
+  hasReviewer: boolean;
+  hasReviewerAccess: boolean;
   todosReady: boolean;
   editMode: TEditMode;
   todosChanged: boolean;
@@ -35,7 +46,6 @@ export function useTaskDetailFooterButtons({
   onTaskDelete: () => Promise<void>;
   metaReady: boolean;
   createMode: boolean;
-  loading: boolean;
 }) {
   const { confirmDelete } = useDeleteConfirm('задачу');
 
@@ -51,7 +61,7 @@ export function useTaskDetailFooterButtons({
       case 'todos': {
         return {
           label: 'Сохранить',
-          disabled: !todosChanged,
+          disabled: !createMode ? !todosChanged : false,
           callback: () => {
             setEditMode(null);
             onTodosSave();
@@ -80,47 +90,69 @@ export function useTaskDetailFooterButtons({
     todosChanged,
   ]);
 
+  const actionButtons = useMemo<IActionButton[]>(() => {
+    return [
+      {
+        key: 'delete-button',
+        label: 'Удалить',
+        visible: hasEditAccess && !createMode && !editMode,
+        type: 'danger',
+        callback: () => confirmDelete(onTaskDelete),
+      },
+      {
+        key: 'primary-button',
+        visible: hasReviewer ? hasReviewerAccess : hasEditAccess || createMode,
+        ...primaryButtonProps,
+      },
+      {
+        key: 'comments-button',
+        label: 'Комментарии',
+        visible: !createMode && !editMode,
+        type: 'default',
+        callback: () => {},
+      },
+    ];
+  }, [
+    hasEditAccess,
+    hasReviewer,
+    hasReviewerAccess,
+    editMode,
+    createMode,
+    primaryButtonProps,
+    onTaskDelete,
+  ]);
+
   return useMemo(
     () => [
       <Button
         key={'close-button'}
-        onClick={() => (editMode ? setEditMode(null) : onCancel())}
+        onClick={() =>
+          !editMode || createMode ? onCancel() : setEditMode(null)
+        }
       >
         {editMode ? 'Отмена' : 'Закрыть'}
       </Button>,
-      ...(hasEditAccess || createMode
-        ? [
-            <Space key={'edit-buttons'}>
-              {!createMode && !editMode && (
-                <Button
-                  danger
-                  key={'delete-button'}
-                  type={'primary'}
-                  onClick={() => confirmDelete(onTaskDelete)}
-                >
-                  Удалить
-                </Button>
-              )}
+      <AnimatedList
+        key={'action-buttons-list'}
+        dataSource={actionButtons}
+        keyProp={'key'}
+        className={Styles.TaskDetailFooterButtons}
+        renderItem={(item) =>
+          item.visible && (
+            <Badge>
               <Button
-                key={'save-edit-button'}
-                type={'primary'}
-                disabled={primaryButtonProps.disabled}
-                onClick={primaryButtonProps.callback}
-                loading={loading}
+                disabled={item.disabled}
+                danger={item.type === 'danger'}
+                type={item.type === 'default' ? 'default' : 'primary'}
+                onClick={item.callback}
               >
-                {primaryButtonProps.label}
+                {item.label}
               </Button>
-            </Space>,
-          ]
-        : []),
+            </Badge>
+          )
+        }
+      />,
     ],
-    [
-      primaryButtonProps,
-      setEditMode,
-      hasEditAccess,
-      createMode,
-      editMode,
-      onCancel,
-    ],
+    [createMode, editMode, onCancel, setEditMode, actionButtons],
   );
 }

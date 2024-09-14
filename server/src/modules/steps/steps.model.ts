@@ -14,6 +14,10 @@ export class Step {
   @Column(DATA_STRING)
   name: string;
 
+  @ApiField('STEP_LABEL')
+  @Column(DATA_STRING)
+  label: string;
+
   @OneToMany(() => Task, (task) => task.step, {})
   tasks: Task[];
 }

@@ -15,6 +15,8 @@ export type TTaskStepAction =
   | 'startWork'
   | 'pauseWork'
   | 'sendToReview'
+  | 'startReview'
+  | 'closeReview'
   | 'deny'
   | 'approve'
   | 'restart';
@@ -24,6 +26,7 @@ export interface ITaskCardStepAction {
   icon: keyof typeof icons;
   toStepId: TStep;
   access: TTaskAccess[number];
+  label?: string;
   hidden?: boolean;
   onChoose?: (changeStepFn: () => void) => void;
 }

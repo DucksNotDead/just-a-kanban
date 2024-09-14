@@ -11,6 +11,8 @@ export interface IReorderProps<T> {
   active?: boolean;
   axis?: 'x' | 'y';
   constraints?: Partial<BoundingBox>;
+  onStart?: (item: T) => void;
+  onEnd?: (item: T) => void;
 }
 
 export interface IReducerDispatchFnArgsGen<E extends string, D> {

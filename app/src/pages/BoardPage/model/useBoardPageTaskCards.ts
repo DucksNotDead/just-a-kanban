@@ -1,18 +1,36 @@
-import { ITaskFull, useTasks } from 'entities/task';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useBoard } from 'entities/board';
+import { useTasks, useTasksApi } from 'entities/task';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ITaskCard } from 'widgets/TaskCard';
 import { ITaskDetailRef } from 'widgets/TaskDetail';
 
-export function useBoardPageTaskCards() {
-  const { tasks, tasksPending } = useTasks();
+import { IBoardPageFilters } from './types/boardPageTypes';
+
+export function useBoardPageTaskCards(filters: IBoardPageFilters) {
+  const { board } = useBoard();
+  const { tasks, tasksPending, dispatchTasks } = useTasks();
+  const tasksApi = useTasksApi();
   const [taskCards, setTaskCards] = useState<ITaskCard[]>([]);
   const taskDetailRef = useRef<ITaskDetailRef>(null);
 
+  const filteredTaskCards = useMemo<ITaskCard[]>(() => {
+    const { search, user, slice } = filters;
+    return taskCards.filter((tc) => {
+      const searchMatch =
+        !search?.trim().length ||
+        tc.task.title.toLowerCase().includes(search?.toLowerCase());
+      const userMatch = !user || tc.task.responsible === user;
+      const sliceMatch = !slice || tc.task.slice === slice;
+
+      return searchMatch && userMatch && sliceMatch;
+    });
+  }, [taskCards, filters]);
+
   const getStepTaskCards = useCallback(
     (stepId: number) => {
-      return taskCards.filter((t) => t.task.step === stepId);
+      return filteredTaskCards.filter((t) => t.task.step === stepId);
     },
-    [taskCards],
+    [filteredTaskCards],
   );
 
   const handleCardClick = useCallback(
@@ -26,23 +44,39 @@ export function useBoardPageTaskCards() {
   );
 
   const handleCardStepChange = useCallback(
-    (taskId: number, stepId: number) => {},
-    [],
+    (taskId: number, stepId: number) => {
+      const prevStep = tasks.find((t) => t.id === taskId)?.step;
+      if (!prevStep) {
+        return;
+      }
+      void tasksApi.changeStep(
+        taskId,
+        stepId,
+        [1, 2].includes(prevStep) ? 'responsible' : 'manager',
+      );
+    },
+    [tasks],
   );
 
-  const handleReorder = useCallback((newOrder: ITaskCard[]) => {
-    setTaskCards(() => {
-      return newOrder.map((tc, index) => ({
-        ...tc,
-        order: index + 1,
-      }));
-    });
-  }, []);
+  const handleCardsReorder = useCallback(
+    (newOrder: ITaskCard[]) => {
+      dispatchTasks({
+        type: 'changeOrder',
+        data: newOrder.map((tc) => ({ taskId: tc.key, order: tc.task.order })),
+      });
+      void tasksApi.changeOrder(board!.slug, {
+        tasks: newOrder.map(({ task: { id, order } }) => ({
+          taskId: id,
+          order,
+        })),
+      });
+    },
+    [board],
+  );
 
   useEffect(() => {
     setTaskCards((prevState) =>
-      ([] as ITaskFull[])
-        .concat(tasks)
+      [...tasks.map((t) => ({ ...t }))]
         .sort((a, b) => {
           return a.order - b.order;
         })
@@ -61,8 +95,9 @@ export function useBoardPageTaskCards() {
   }, [tasks]);
 
   return {
+    tasksPending,
     taskDetailRef,
-    handleReorder,
+    handleCardsReorder,
     getStepTaskCards,
     handleCardClick,
     handleCardStepChange,

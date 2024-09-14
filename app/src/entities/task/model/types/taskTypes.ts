@@ -54,14 +54,20 @@ export interface ITaskReviewerSetResponse {
   reviewer: number | null;
 }
 
-export interface ITaskOrderChangeResponse {
-  taskId: number;
-  order: number;
+export interface ITaskOrderChangeRequest {
+  tasks: {
+    taskId: number;
+    order: number;
+  }[];
+}
+
+export interface ITaskOrderChangeResponse extends ITaskOrderChangeRequest {
+  stepId: TStep;
 }
 
 export interface ITaskStepChangeResponse {
   taskId: number;
-  step: number;
+  stepId: TStep;
 }
 
 type TTaskAction =
@@ -82,11 +88,11 @@ type TTasksReducerDispatchArgs =
   | TTasksReducerDispatchFnArgsGen<'changeMeta', ITaskFull>
   | TTasksReducerDispatchFnArgsGen<
       'changeStep',
-      { taskId: number; stepId: number }
+      { taskId: number; stepId: TStep }
     >
   | TTasksReducerDispatchFnArgsGen<
       'changeOrder',
-      { taskId: number; order: number }[]
+      ITaskOrderChangeResponse['tasks']
     >
   | TTasksReducerDispatchFnArgsGen<
       'setReviewer',

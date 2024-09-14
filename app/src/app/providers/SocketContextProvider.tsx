@@ -19,6 +19,7 @@ export function SocketContextProvider({ children }: IProps) {
         authorization: 'Bearer ' + window.localStorage.getItem(TOKEN_KEY),
       },
       query: { boardSlug: board?.slug },
+
     });
 
     instance.on('connect', () => {

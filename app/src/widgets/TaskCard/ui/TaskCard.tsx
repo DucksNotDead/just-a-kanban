@@ -1,5 +1,6 @@
 import { Progress } from 'antd';
 import { useSlices } from 'entities/slice';
+import { useTasksApi } from 'entities/task';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ReactNode, useCallback, useMemo } from 'react';
 import { appTransitions } from 'shared/const';
@@ -26,16 +27,20 @@ export function TaskCard({
   onClick,
   onStepChangeClick,
 }: IProps) {
+  const tasksApi = useTasksApi();
   const { slices } = useSlices();
 
-  const handleDeny = useCallback<Required<ITaskCardStepAction>['onChoose']>(
-    (changeStepFn) => {},
-    [],
-  );
+  const handleReviewerChange = useCallback(() => {
+    void tasksApi.setReviewer(task.id);
+  }, [task.id]);
+
+  const handleReviewDeny = useCallback<
+    Required<ITaskCardStepAction>['onChoose']
+  >(() => {}, []);
 
   const sliceColor = useMemo(() => {
     return slices.find((s) => s.id === task.slice)?.color;
-  }, [slices]);
+  }, [slices, task]);
 
   const ghostStyle = useMemo(() => {
     return status === 'ghost' ? Styles.Hidden : Styles.Visible;
@@ -43,15 +48,26 @@ export function TaskCard({
 
   const actions = useMemo(() => {
     return getTaskCardStepActionsConfig(
-      task.doneTodosCount === task.todosCount,
-      handleDeny,
+      task.doneTodosCount === task.todosCount || task.todosCount === 0,
+      !!task.reviewer,
+      handleReviewerChange,
+      handleReviewDeny,
     );
-  }, [task.todosCount, task.doneTodosCount, handleDeny]);
+  }, [
+    task.todosCount,
+    task.doneTodosCount,
+    task.reviewer,
+    handleReviewerChange,
+    handleReviewDeny,
+  ]);
 
   const todosPercent = useMemo(() => {
-    const percent = (task.doneTodosCount / task.todosCount) * 100;
-    return percent > 3 ? percent : 3;
-  }, [task.todosCount, task.doneTodosCount]);
+    const { todosCount, doneTodosCount, step } = task;
+    const percent = (doneTodosCount / todosCount) * 100;
+    const percentWithConditions =
+      todosCount === 0 ? (step === 1 ? 0 : 100) : percent;
+    return percentWithConditions > 3 ? percentWithConditions : 3;
+  }, [task.todosCount, task.doneTodosCount, task.step]);
 
   return (
     <motion.div
@@ -61,7 +77,12 @@ export function TaskCard({
       whileTap={appTransitions.scale.variants.hidden}
       onClick={() => onClick(task.id)}
     >
-      <TaskCardMetaInfo userId={task.responsible} color={sliceColor} />
+      <TaskCardMetaInfo
+        responsibleId={task.responsible}
+        reviewerId={task.reviewer}
+        stepId={task.step}
+        color={sliceColor}
+      />
       {control}
       <div className={`${Styles.TaskCardMain} ${ghostStyle}`}>
         <h3>{toFixedName(task.title, 40)}</h3>
