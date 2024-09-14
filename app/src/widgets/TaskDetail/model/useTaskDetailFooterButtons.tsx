@@ -104,13 +104,13 @@ export function useTaskDetailFooterButtons({
         visible: hasReviewer ? hasReviewerAccess : hasEditAccess || createMode,
         ...primaryButtonProps,
       },
-      {
+      /*{
         key: 'comments-button',
         label: 'Комментарии',
         visible: !createMode && !editMode,
         type: 'default',
         callback: () => {},
-      },
+      },*/
     ];
   }, [
     hasEditAccess,

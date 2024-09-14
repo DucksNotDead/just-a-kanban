@@ -60,7 +60,7 @@ export const TaskDetail = forwardRef<ITaskDetailRef>((_, ref) => {
   const [createMode, setCreateMode] = useState(false);
   const [metaReady, setMetaReady] = useState(false);
 
-  const { hasAccess, hasAnyAccess } = useTaskAccess(taskUsersInfo);
+  const { hasAccess } = useTaskAccess(taskUsersInfo);
 
   const hasEditAccess = useMemo(() => {
     return hasAccess('manager') || createMode;
@@ -244,9 +244,9 @@ export const TaskDetail = forwardRef<ITaskDetailRef>((_, ref) => {
                     editMode={editMode === 'todos'}
                     toggleAccess={
                       !createMode &&
-                      hasAnyAccess(['responsible', 'reviewer']) &&
                       !!taskStepId &&
-                      [2, 3].includes(taskStepId)
+                      ((taskStepId === 2 && hasAccess('responsible')) ||
+                        (taskStepId === 3 && hasAccess('reviewer')))
                     }
                   />
                 </motion.div>

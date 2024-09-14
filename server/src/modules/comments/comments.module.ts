@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { CommentsController } from './comments.controller';
@@ -13,9 +13,10 @@ import { TasksModule } from '../tasks/tasks.module';
   imports: [
     TypeOrmModule.forFeature([Comment]),
     BoardsModule,
-    TasksModule,
+    forwardRef(() => TasksModule),
     SocketModule,
   ],
   controllers: [CommentsController],
+  exports: [CommentsService],
 })
 export class CommentsModule {}

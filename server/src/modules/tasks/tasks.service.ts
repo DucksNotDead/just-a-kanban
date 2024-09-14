@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -7,6 +7,7 @@ import { TasksChangeOrderDto } from './dto/tasks-change-order-dto';
 import { Task } from './tasks.model';
 import { Exception } from '../../config/exception';
 import { Board } from '../boards/boards.model';
+import { CommentsService } from '../comments/comments.service';
 import { SlicesService } from '../slices/slices.service';
 import { SocketService } from '../socket/socket.service';
 import { StepsService } from '../steps/steps.service';
@@ -22,18 +23,14 @@ export class TasksService {
     private readonly slicesService: SlicesService,
     private readonly stepsService: StepsService,
     private readonly todosService: TodosService,
+    @Inject(forwardRef(() => CommentsService))
+    private readonly commentsService: CommentsService,
     private readonly socketService: SocketService,
   ) {}
 
   async getByUserBoard(board: Board, user: User) {
-    /*return await this.tasks.find({
-      where: board.managers.find((m) => m.id === user.id)
-        ? { board: { id: board.id } }
-        : { board: { id: board.id }, responsible: { id: user.id } },
-      loadRelationIds: true,
-    });*/
-    const isManager = board.managers.find((m) => m.id === user.id);
-    return this.tasks
+    const isManager = !!board.managers.find((m) => m.id === user.id);
+    const tasks = await this.tasks
       .createQueryBuilder('task')
       .innerJoinAndSelect('task.board', 'board')
       .innerJoinAndSelect('task.responsible', 'responsible')
@@ -52,6 +49,15 @@ export class TasksService {
       )
       .loadAllRelationIds()
       .getMany();
+
+    for (const task of tasks) {
+      task.unreadCommentsCount = await this.commentsService.getUnreadCount(
+        task.id,
+        user.id,
+      );
+    }
+
+    return tasks;
   }
 
   async getForTaskAccess(id: number) {
@@ -220,9 +226,13 @@ export class TasksService {
       throw Exception.NotFound('reviewer');
     }
     if (to === 1) {
-      const todos = await this.todosService.getByTask(task.id);
-      for (const {id} of todos) {
-        await this.todosService.toggle(id, boardSlug, user.id)
+      if (task.step.id === 4) {
+        const todos = await this.todosService.getByTask(task.id);
+        for (const { id, checked } of todos) {
+          if (checked) {
+            await this.todosService.toggle(id, boardSlug, user.id);
+          }
+        }
       }
       task.reviewer = null;
     }
@@ -266,13 +276,6 @@ export class TasksService {
     );
   }
 
-  private async getForResponse(id: number) {
-    return await this.tasks.findOne({
-      where: { id },
-      loadRelationIds: true,
-    });
-  }
-
   async delete(id: number, board: Board, userId: number) {
     const task = await this.tasks.findOne({
       where: { id },
@@ -301,6 +304,13 @@ export class TasksService {
       board.slug,
       task.responsible.id,
     );
+  }
+
+  private async getForResponse(id: number) {
+    return await this.tasks.findOne({
+      where: { id },
+      loadRelationIds: true,
+    });
   }
 
   private async getByBoard(board: Board) {

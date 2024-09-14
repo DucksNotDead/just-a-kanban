@@ -83,4 +83,10 @@ export class Task {
 
   @Column(DATA_HIDDEN)
   doneTodosCount: number;
+
+  @Column(DATA_HIDDEN)
+  unreadCommentsCount: number;
+
+  @Column(DATA_HIDDEN)
+  lastComment: Comment;
 }

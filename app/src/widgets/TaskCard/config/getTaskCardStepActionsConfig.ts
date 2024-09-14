@@ -5,7 +5,6 @@ export const getTaskCardStepActionsConfig = (
   taskReady: boolean,
   hasReviewer: boolean,
   handleReviewerChange: ITaskCardStepAction['onChoose'],
-  onReviewDeny: ITaskCardStepAction['onChoose'],
 ): {
   [P in TStep]: ITaskCardStepAction[];
 } => ({
@@ -36,9 +35,8 @@ export const getTaskCardStepActionsConfig = (
     {
       toStepId: 1,
       key: 'deny',
-      icon: 'MessageCircleReply',
+      icon: 'Undo2',
       access: 'reviewer',
-      onChoose: onReviewDeny,
       hidden: taskReady,
     },
     {

@@ -59,7 +59,12 @@ export function BoardPageHeader({ setFilters, taskDetailDialogRef }: IProps) {
   return (
     <div className={Styles.BoardKanbanPageHeader}>
       <div className={Styles.Item}>
-        <Button onClick={handleBackClick} type={'text'} icon={<House />} />
+        <Button
+          onClick={handleBackClick}
+          type={'text'}
+          style={{ flexShrink: 0 }}
+          icon={<House />}
+        />
         <Input
           variant={'filled'}
           placeholder={'поиск...'}
@@ -81,6 +86,12 @@ export function BoardPageHeader({ setFilters, taskDetailDialogRef }: IProps) {
           <UserSelect onChange={handleUserSelect} filled />
         )}
         <UserAvatar avatar={user?.avatar} />
+        {/*<Button
+          onClick={handleBackClick}
+          type={'text'}
+          style={{ flexShrink: 0 }}
+          icon={<MessageCircle />}
+        />*/}
       </div>
     </div>
   );

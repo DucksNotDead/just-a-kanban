@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ReactNode, useCallback, useMemo } from 'react';
 import { appTransitions } from 'shared/const';
 import { toFixedName } from 'shared/utils';
-import { ITaskCard, ITaskCardStepAction } from 'widgets/TaskCard';
+import { ITaskCard } from 'widgets/TaskCard';
 import { TaskCardMetaInfo } from 'widgets/TaskCard/ui/TaskCardMetaInfo';
 
 import { TaskCardStepAction } from './TaskCardStepAction';
@@ -34,10 +34,6 @@ export function TaskCard({
     void tasksApi.setReviewer(task.id);
   }, [task.id]);
 
-  const handleReviewDeny = useCallback<
-    Required<ITaskCardStepAction>['onChoose']
-  >(() => {}, []);
-
   const sliceColor = useMemo(() => {
     return slices.find((s) => s.id === task.slice)?.color;
   }, [slices, task]);
@@ -51,14 +47,12 @@ export function TaskCard({
       task.doneTodosCount === task.todosCount || task.todosCount === 0,
       !!task.reviewer,
       handleReviewerChange,
-      handleReviewDeny,
     );
   }, [
     task.todosCount,
     task.doneTodosCount,
     task.reviewer,
     handleReviewerChange,
-    handleReviewDeny,
   ]);
 
   const todosPercent = useMemo(() => {

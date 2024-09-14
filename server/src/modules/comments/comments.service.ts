@@ -17,7 +17,37 @@ export class CommentsService {
   ) {}
 
   async getByTask(id: number) {
-    return await this.comments.findBy({ task: { id } });
+    return await this.comments.find({
+      where: { task: { id } },
+      loadRelationIds: { relations: ['readBy'] },
+    });
+  }
+
+  async getUnreadCount(taskId: number, userId: number) {
+    const { readBy } = await this.comments.findOne({
+      where: { task: { id: taskId } },
+      loadRelationIds: { relations: ['readBy'] },
+      select: ['task', 'readBy'],
+    });
+    return await this.comments
+      .createQueryBuilder('comment')
+      .innerJoinAndSelect('comment.user','user')
+      .where(':userId != user.id AND :userId NOT IN (:...usersWhoRead)', {
+        userId,
+        usersWhoRead: [...readBy, -1],
+      })
+      .getCount();
+  }
+
+  async getLast(taskId: number) {
+    return await this.comments.findOne({
+      where: { task: { id: taskId }, isService: false },
+      loadRelationIds: { relations: ['readBy', 'user'] },
+      order: {
+        date: 'DESC',
+        time: 'DESC',
+      },
+    });
   }
 
   async create(
@@ -36,10 +66,14 @@ export class CommentsService {
 
     await this.comments.save(newComment);
 
-    this.socketService.send({
-      from: user.id,
-      event: 'commentCreate',
-      content: { taskId }
-    }, boardSlug, task.responsible.id);
+    this.socketService.send(
+      {
+        from: user.id,
+        event: 'commentCreate',
+        content: { taskId },
+      },
+      boardSlug,
+      task.responsible.id,
+    );
   }
 }

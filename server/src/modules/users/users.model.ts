@@ -45,6 +45,9 @@ export class User {
   @OneToMany(() => Comment, (comment) => comment.user)
   comments: Comment[];
 
+  @ManyToMany(() => Comment, comment => comment.readBy)
+  readComments: Comment[]
+
   @OneToMany(() => Board, (board) => board.createdBy)
   createdBoards: Board[];
 

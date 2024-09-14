@@ -51,7 +51,7 @@ export const tasksReducer: TTasksReducer = (state, { type, data }) => {
       if (!item) {
         return state;
       }
-      if (item.step === 4 && data.stepId === 1) {
+      if ([3, 4].includes(item.step) && data.stepId === 1) {
         item.reviewer = null;
       }
       item.step = data.stepId;
