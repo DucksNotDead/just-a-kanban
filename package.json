@@ -12,10 +12,13 @@
     "typescript-eslint": "^8.1.0"
   },
   "dependencies": {
+    "concurrently": "^9.0.1",
     "copyfiles": "^2.4.1",
     "module-alias": "^2.2.3"
   },
   "scripts": {
-    "build-app": "rm -rf ./build && copyfiles -f server/media/* build/media && copyfiles -f server/package.json build && cd app && npm run build-client && cd ../server && npm run build-server && copyfiles -f ../app/.env ../build/client && cd ../build && npm i"
+    "prebuild": "concurrently \"cd app && npm i\" \"cd server && npm i\"",
+    "build": "rm -rf ./build && copyfiles -f server/media/* build/media && copyfiles -f server/package.json build && cd app && npm run build-client && cd ../server && npm run build-server && copyfiles -f .env ../build/server && copyfiles -f ../app/.env ../build/client && cd ../build && npm i",
+    "start": "node build/server/main.js"
   }
 }
