@@ -1,13 +1,19 @@
-export const API_BASE_URL = 'http://localhost:8000'
+const API_PATH = process.env.REACT_APP_API_PATH;
 
-export const MEDIA_BASE_URL = `${API_BASE_URL}/media`
+const WS_PATH = process.env.REACT_APP_WS_PATH;
 
-export const TOKEN_KEY = 'AUTH_TOKEN'
+export const API_BASE_URL = `${API_PATH}/api`;
 
-export const CHOSEN_BOARD_KEY = 'CHOSEN_BOARD'
+export const WS_BASE_URL = WS_PATH+'';
 
-export const PAGE_TRANSITION_DURATION = 300
+export const MEDIA_BASE_URL = `${API_PATH}/media`;
 
-export const DATE_TIME_FORMAT = 'HH:mm – DD.MM.YYYY'
+export const TOKEN_KEY = 'AUTH_TOKEN';
 
-export const PENDING_TIMEOUT = 600
+export const CHOSEN_BOARD_KEY = 'CHOSEN_BOARD';
+
+export const PAGE_TRANSITION_DURATION = 300;
+
+export const DATE_TIME_FORMAT = 'HH:mm – DD.MM.YYYY';
+
+export const PENDING_TIMEOUT = 600;

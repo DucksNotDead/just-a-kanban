@@ -1,15 +1,16 @@
-import { Body, Controller, Delete, Get, Param, Post } from "@nestjs/common";
-import { ApiTags } from "@nestjs/swagger";
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 
-import { UserCreateDto } from "./dto/user-create-dto";
-import { ReqUser } from "./user.decorator";
-import { User } from "./users.model";
-import { UsersService } from "./users.service";
-import { AdminAccess } from "../../access/admin";
-import { BoardAccess } from "../../access/board";
-import { ApiMethod } from "../../config/swagger";
-import { ReqBoardSlug } from "../boards/board.decorator";
-import { BOARD_SLUG_KEY } from "../boards/boards.const";
+import { UserCreateDto } from './dto/user-create-dto';
+import { ReqUser } from './user.decorator';
+import { User } from './users.model';
+import { UsersService } from './users.service';
+import { AdminAccess } from '../../access/admin';
+import { BoardAccess } from '../../access/board';
+import { PublicAccess } from '../../access/public';
+import { ApiMethod } from '../../config/swagger';
+import { ReqBoardSlug } from '../boards/board.decorator';
+import { BOARD_SLUG_KEY } from '../boards/boards.const';
 
 @ApiTags('users')
 @Controller('users')
@@ -23,7 +24,9 @@ export class UsersController {
     return this.service.getAll(user.id);
   }
 
-  @ApiMethod('Get users in chosen board (board access)', { params: [BOARD_SLUG_KEY] })
+  @ApiMethod('Get users in chosen board (board access)', {
+    params: [BOARD_SLUG_KEY],
+  })
   @BoardAccess()
   @Get(`:${BOARD_SLUG_KEY}`)
   getByBoard(@ReqBoardSlug() slug: string) {
@@ -35,6 +38,13 @@ export class UsersController {
   @Post()
   create(@Body() user: UserCreateDto) {
     return this.service.create(user);
+  }
+
+  @ApiMethod('Create new admin if not exist (public)')
+  @PublicAccess()
+  @Post('/admin')
+  createAdmin() {
+    return this.service.createAdmin();
   }
 
   @ApiMethod('Delete user (admin)', { params: ['id'] })

@@ -16,7 +16,6 @@ import 'dotenv/config'
       secret: process.env.SECRET,
       signOptions: {
         expiresIn: '24h',
-        algorithm: 'ES512'
       },
     }),
     TypeOrmModule.forFeature([User]),

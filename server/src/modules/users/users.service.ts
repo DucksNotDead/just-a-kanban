@@ -64,6 +64,14 @@ export class UsersService {
     };
   }
 
+  async createAdmin() {
+    return await this.create({
+      username: 'ducksnotdead',
+      isAdmin: true,
+      name: 'Админ',
+    });
+  }
+
   async delete(id: number) {
     const candidate = await this.users.findOneBy({ id });
     if (!candidate) {

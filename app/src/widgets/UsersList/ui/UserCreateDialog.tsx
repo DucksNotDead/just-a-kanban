@@ -91,7 +91,7 @@ export const UserCreateDialog = forwardRef<IModalRef, IProps>(
                   },
                 ]}
               >
-                {isSwitch ? <Switch /> : <Input />}
+                {isSwitch ? <Switch /> : <Input maxLength={60}/>}
               </Form.Item>
             );
           })}

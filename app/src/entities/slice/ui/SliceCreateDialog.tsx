@@ -64,7 +64,7 @@ export const SliceCreateDialog = forwardRef<IModalRef, IProps>(
               { required: true, message: appMessages.validation.required },
             ]}
           >
-            <Input placeholder={'название'} />
+            <Input placeholder={'название'} maxLength={60}/>
           </Form.Item>
           <Form.Item
             name={'color'}

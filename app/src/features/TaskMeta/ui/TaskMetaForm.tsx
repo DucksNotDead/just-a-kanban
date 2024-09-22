@@ -114,7 +114,7 @@ export function TaskMetaForm({ data, onChange, onReadyChange }: IProps) {
                   onChange={handleSliceChange}
                 />
               ) : (
-                <Input placeholder={'Название'} />
+                <Input placeholder={'Название'} maxLength={60}/>
               )}
             </Form.Item>
           ))}

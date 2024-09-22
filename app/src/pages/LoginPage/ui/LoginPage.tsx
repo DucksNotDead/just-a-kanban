@@ -51,7 +51,7 @@ export function LoginPage() {
               { required: true, message: appMessages.validation.required },
             ]}
           >
-            <Input type={field.name}/>
+            <Input type={field.name} maxLength={60}/>
           </Form.Item>
         ))}
         <Form.Item className={Styles.SubmitButtonBox}>

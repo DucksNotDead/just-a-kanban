@@ -64,15 +64,18 @@ export function useBoardPageTaskCards(filters: IBoardPageFilters) {
         type: 'changeOrder',
         data: newOrder.map((tc) => ({ taskId: tc.key, order: tc.task.order })),
       });
-      void tasksApi.changeOrder(board!.slug, {
-        tasks: newOrder.map(({ task: { id, order } }) => ({
-          taskId: id,
-          order,
-        })),
-      });
     },
     [board],
   );
+
+  const handleCardsReorderEnd = useCallback(() => {
+    void tasksApi.changeOrder(board!.slug, {
+      tasks: taskCards.map(({ task: { id, order } }) => ({
+        taskId: id,
+        order,
+      })),
+    });
+  }, [taskCards]);
 
   useEffect(() => {
     setTaskCards((prevState) =>
@@ -101,5 +104,6 @@ export function useBoardPageTaskCards(filters: IBoardPageFilters) {
     getStepTaskCards,
     handleCardClick,
     handleCardStepChange,
+    handleCardsReorderEnd,
   };
 }

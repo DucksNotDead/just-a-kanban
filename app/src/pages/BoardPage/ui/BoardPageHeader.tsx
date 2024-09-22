@@ -66,6 +66,7 @@ export function BoardPageHeader({ setFilters, taskDetailDialogRef }: IProps) {
           icon={<House />}
         />
         <Input
+          maxLength={60}
           variant={'filled'}
           placeholder={'поиск...'}
           onInput={handeSearch}

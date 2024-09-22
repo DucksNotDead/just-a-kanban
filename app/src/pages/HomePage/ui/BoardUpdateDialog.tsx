@@ -167,6 +167,7 @@ export const BoardUpdateDialog = forwardRef<IModalRef, IProps>(
               const target = e.target as HTMLInputElement;
               setName(() => target.value);
             }}
+            maxLength={60}
           />
           <UserSelect
             value={users.map((u) => u.id)}

@@ -1,11 +1,11 @@
 import { useBoard } from 'entities/board';
-import { StepBox, useSteps } from 'entities/step';
+import { StepBox, TStep, useSteps } from 'entities/step';
 import { UserItem } from 'entities/user';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { appTransitions } from 'shared/const';
 import { AnimatedList } from 'shared/ui';
-import { TaskCard } from 'widgets/TaskCard';
+import { ITaskCard, TaskCard } from 'widgets/TaskCard';
 import { TaskDetail } from 'widgets/TaskDetail';
 
 import { BoardPageHeader } from './BoardPageHeader';
@@ -36,12 +36,18 @@ export function BoardPage() {
     getStepTaskCards,
     handleCardClick,
     handleCardStepChange,
+    handleCardsReorderEnd
   } = useBoardPageTaskCards(filters);
 
   const { hasManagerAccess } = useBoard();
 
   const { reorderers, handleStepReorderStart, handleStepReorderingEnd } =
     useBoardPageStepReorderState();
+
+  const handleBoardPageStepReorderEnd = useCallback((stepId: TStep) => {
+    handleStepReorderingEnd(stepId)
+    handleCardsReorderEnd()
+  }, []);
 
   useBoardPageTaskCardsSocket();
 
@@ -85,7 +91,7 @@ export function BoardPage() {
                   setter: handleCardsReorder,
                   axis: 'y',
                   onStart: ({ task: { step } }) => handleStepReorderStart(step),
-                  onEnd: ({ task: { step } }) => handleStepReorderingEnd(step),
+                  onEnd: ({ task: { step } }) => handleBoardPageStepReorderEnd(step),
                 }}
                 renderItem={(item, control, index) => (
                   <TaskCard
