@@ -15,7 +15,5 @@ const config = {
   synchronize: false,
 };
 
-console.log(config)
-
 export default registerAs('typeorm', () => config);
 export const connectionSource = new DataSource(config as DataSourceOptions);
