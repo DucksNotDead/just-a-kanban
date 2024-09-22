@@ -13,7 +13,7 @@ import { SocketService } from './modules/socket/socket.service';
 
 import 'dotenv/config';
 
-@WebSocketGateway(80, { cors: { origin: process.env.CORS_ORIGIN }})
+@WebSocketGateway(80, { cors: { origin: 'http://localhost:3000' }})
 export class AppGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
@@ -25,7 +25,6 @@ export class AppGateway
 
   afterInit(server: Server) {
     this.socketService.init(server);
-    console.log(server);
   }
 
   async handleConnection(client: Socket) {
