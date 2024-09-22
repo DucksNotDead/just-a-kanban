@@ -74,7 +74,7 @@ export function AuthContextProvider({ children }: IProps) {
     } else {
       navigate(appRoutes.login);
     }
-  }, [hasToken, isLogin]);
+  }, [hasToken, isLogin, navigate]);
 
   return (
     <userContext.Provider

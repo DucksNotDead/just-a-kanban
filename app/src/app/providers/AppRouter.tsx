@@ -1,5 +1,5 @@
-import { useRef } from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { useEffect, useRef } from 'react';
+import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import { CSSTransition, SwitchTransition } from 'react-transition-group';
 import { PAGE_TRANSITION_DURATION, appRoutes } from 'shared/const';
 
