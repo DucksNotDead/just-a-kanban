@@ -4,6 +4,8 @@ import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
+import 'dotenv/config'
+
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -26,7 +28,9 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('swagger', app, document);
 
-  await app.listen(3005, 'localhost')
+  await app.listen(3005, 'localhost', () => {
+    console.log(process.env);
+  })
 }
 
 void bootstrap();

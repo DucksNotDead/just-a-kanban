@@ -13,7 +13,7 @@ import 'dotenv/config'
   imports: [
     JwtModule.register({
       global: true,
-      secret: process.env.SECRET,
+      secret: process.env.GUARD,
       signOptions: {
         expiresIn: '24h',
       },
