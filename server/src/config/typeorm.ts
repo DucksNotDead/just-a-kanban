@@ -8,8 +8,8 @@ const config = {
   username: 'root',
   password: 'root',
   database: 'kanban',
-  entities: ['dist/**/*.model{.ts,.js}'],
-  migrations: ['dist/migrations/*{.ts,.js}'],
+  entities: ['../build/**/*.model{.ts,.js}'],
+  migrations: ['../build/migrations/*{.ts,.js}'],
   autoLoadEntities: true,
   synchronize: false,
 };
