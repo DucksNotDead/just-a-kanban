@@ -19,6 +19,6 @@
   "scripts": {
     "prebuild": "concurrently \"cd app && npm i\" \"cd server && npm i\"",
     "build": "rm -rf ./build && copyfiles -f server/media/* build/media && copyfiles -f server/package.json build && cd app && npm run build-client && cd ../server && npm run build-server && copyfiles -f .env ../build/server && copyfiles -f ../app/.env ../build/client && cd ../build && npm i",
-    "start": "node build/server/main.js"
+    "start": "GUARD=`secret` node build/server/main.js"
   }
 }
