@@ -11,7 +11,7 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api')
 
-  app.enableCors({ origin: 'http://localhost:3005' , methods: '*'});
+  app.enableCors();
 
   app.useStaticAssets(join(__dirname, '..', 'media'), {
     prefix: '/media/',
